@@ -1,0 +1,14 @@
+# Don't publish these to npm
+examples/
+src/
+*.log
+.DS_Store
+rollup.config.js
+setup-*.sh
+
+# Keep these for documentation reference
+!README.md
+!GETTING_STARTED.md
+!QUICK_REFERENCE.md
+!BEGINNER_GUIDE.md
+

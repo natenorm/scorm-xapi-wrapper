@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+*.zip
+
+# Keep dist for distribution but ignore during dev
+# (Uncomment if you want to track dist/)
+# !dist/
+
+# Keep templates
+!templates/

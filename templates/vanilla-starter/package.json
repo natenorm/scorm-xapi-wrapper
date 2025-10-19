@@ -1,0 +1,17 @@
+{
+  "name": "vanilla-scorm-course",
+  "version": "1.0.0",
+  "description": "Vanilla JavaScript SCORM course",
+  "scripts": {
+    "dev": "npx http-server . -p 8080 -o",
+    "build": "node build.js",
+    "package": "npm run build && node ../../tools/package-builder.js -i dist -o course.zip"
+  },
+  "dependencies": {
+    "scorm-xapi-wrapper": "file:../.."
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
+

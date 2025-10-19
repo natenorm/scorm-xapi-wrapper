@@ -1,0 +1,58 @@
+{
+  "name": "scorm-xapi-wrapper",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Framework-agnostic SCORM 2004 and xAPI wrapper for custom e-learning content",
+  "main": "dist/scorm-wrapper.cjs.js",
+  "module": "dist/scorm-wrapper.esm.js",
+  "browser": "dist/scorm-wrapper.umd.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "dist",
+    "types",
+    "templates",
+    "tools"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c -w",
+    "dev": "npm run watch"
+  },
+  "bin": {
+    "create-scorm-course": "./cli.js",
+    "package-scorm": "./tools/package-builder.js"
+  },
+  "keywords": [
+    "scorm",
+    "scorm2004",
+    "xapi",
+    "tin-can",
+    "elearning",
+    "lms",
+    "learning",
+    "course-builder",
+    "create-scorm-course",
+    "e-learning",
+    "training"
+  ],
+  "author": "Your Name <your@email.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/scorm-wrapper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/scorm-wrapper/issues"
+  },
+  "homepage": "https://github.com/yourusername/scorm-wrapper#readme",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.9.6"
+  },
+  "dependencies": {
+    "archiver": "^6.0.1",
+    "commander": "^11.1.0"
+  }
+}
+

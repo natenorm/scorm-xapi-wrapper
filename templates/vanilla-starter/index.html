@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCORM Course</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="course-container">
+    <header>
+      <h1>Welcome to Your Course</h1>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressBar"></div>
+      </div>
+    </header>
+
+    <main id="content">
+      <!-- Page 1 -->
+      <div class="page active" data-page="1">
+        <h2>Page 1: Introduction</h2>
+        <p>Welcome! This is a sample SCORM course using the vanilla JavaScript template.</p>
+        <p>Your progress is automatically saved every 30 seconds and when you navigate between pages.</p>
+        <ul>
+          <li>Navigate using the buttons below</li>
+          <li>Close and reopen - your progress will be saved</li>
+          <li>Complete all pages to finish the course</li>
+        </ul>
+      </div>
+
+      <!-- Page 2 -->
+      <div class="page" data-page="2">
+        <h2>Page 2: Content</h2>
+        <p>This is the second page of your course.</p>
+        <p>You can add any HTML content here:</p>
+        <ul>
+          <li>Text and images</li>
+          <li>Videos and audio</li>
+          <li>Interactive elements</li>
+          <li>Quizzes and assessments</li>
+        </ul>
+      </div>
+
+      <!-- Page 3 -->
+      <div class="page" data-page="3">
+        <h2>Page 3: Interactive Example</h2>
+        <p>Try this simple interaction:</p>
+        <div class="interaction">
+          <label for="userInput">Enter your name:</label>
+          <input type="text" id="userInput" placeholder="Your name">
+          <button onclick="saveUserData()">Save</button>
+          <p id="greeting"></p>
+        </div>
+      </div>
+
+      <!-- Page 4 -->
+      <div class="page" data-page="4">
+        <h2>Page 4: Completion</h2>
+        <p>Congratulations! You've reached the end of the course.</p>
+        <p>Click "Complete Course" to mark this course as finished.</p>
+        <button class="complete-btn" onclick="completeCourse()">Complete Course</button>
+        <div id="completionMessage"></div>
+      </div>
+    </main>
+
+    <nav class="navigation">
+      <button id="prevBtn" onclick="previousPage()">← Previous</button>
+      <span id="pageIndicator">Page 1 of 4</span>
+      <button id="nextBtn" onclick="nextPage()">Next →</button>
+    </nav>
+  </div>
+
+  <script type="module" src="course.js"></script>
+</body>
+</html>
+
