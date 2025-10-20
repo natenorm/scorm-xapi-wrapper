@@ -1,0 +1,19 @@
+{
+  "name": "scorm2004-comprehensive-test",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Comprehensive SCORM 2004 test course with resume, completion, and data tracking",
+  "scripts": {
+    "dev": "npm run build && npx http-server dist -p 8080 -o",
+    "build": "node build.js",
+    "package": "npm run build && npx package-scorm -i dist -o scorm2004-test.zip --title 'SCORM 2004 Comprehensive Test'"
+  },
+  "dependencies": {
+    "scorm-xapi-wrapper": "file:../.."
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
+
+

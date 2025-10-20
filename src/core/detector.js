@@ -1,24 +1,85 @@
 /**
  * Environment Detector
- * Detects which LMS environment is available (SCORM 2004, xAPI, or local)
+ * Detects which LMS environment is available (SCORM 2004, SCORM 1.2, xAPI, or local)
+ * Based on pipwerks SCORM API Wrapper approach
  */
 
 export class EnvironmentDetector {
   /**
+   * Finds SCORM API in window hierarchy
+   * Traverses parent frames looking for API or API_1484_11
+   * @param {Window} win - Window object to search from
+   * @returns {Object|null} - { type, handle } or null
+   */
+  static findAPI(win) {
+    let API = null;
+    let findAttempts = 0;
+    const findAttemptLimit = 500;
+    
+    try {
+      // Traverse parent frame hierarchy
+      while ((!win.API && !win.API_1484_11) &&
+             (win.parent) &&
+             (win.parent !== win) &&
+             (findAttempts <= findAttemptLimit)) {
+        findAttempts++;
+        win = win.parent;
+      }
+      
+      // Determine which API was found
+      if (win.API_1484_11) {
+        API = { type: 'scorm2004', handle: win.API_1484_11 };
+      } else if (win.API) {
+        API = { type: 'scorm12', handle: win.API };
+      }
+    } catch (e) {
+      // Cross-origin restrictions may prevent access
+    }
+    
+    return API;
+  }
+
+  /**
    * Detects the available LMS environment
-   * @returns {Object} - { type: 'scorm2004' | 'xapi' | 'local', api: object }
+   * Uses multiple search strategies (pipwerks approach)
+   * @returns {Object} - { type: 'scorm2004' | 'scorm12' | 'xapi' | 'local', api: object }
    */
   static detect() {
-    // Check for SCORM 2004 API
-    const scorm2004API = this.findSCORM2004API();
-    if (scorm2004API) {
-      return { type: 'scorm2004', api: scorm2004API };
+    let API = null;
+
+    // Strategy 1: Search from current window
+    API = this.findAPI(window);
+
+    // Strategy 2: Search from parent window
+    if (!API && window.parent && window.parent !== window) {
+      try {
+        API = this.findAPI(window.parent);
+      } catch (e) {
+        // Cross-origin restriction
+      }
     }
 
-    // Check for SCORM 1.2 API (optional future support)
-    const scorm12API = this.findSCORM12API();
-    if (scorm12API) {
-      return { type: 'scorm12', api: scorm12API };
+    // Strategy 3: Search from opener window
+    if (!API && window.top && window.top.opener) {
+      try {
+        API = this.findAPI(window.top.opener);
+      } catch (e) {
+        // Cross-origin restriction
+      }
+    }
+
+    // Strategy 4: Plateau LMS special handling
+    if (!API && window.top && window.top.opener && window.top.opener.document) {
+      try {
+        API = this.findAPI(window.top.opener.document);
+      } catch (e) {
+        // Cross-origin restriction
+      }
+    }
+
+    // If SCORM API found, return it
+    if (API) {
+      return { type: API.type, api: API.handle };
     }
 
     // Check for xAPI configuration
@@ -29,58 +90,6 @@ export class EnvironmentDetector {
 
     // Default to local development mode
     return { type: 'local', api: null };
-  }
-
-  /**
-   * Finds SCORM 2004 API (API_1484_11)
-   * Searches current window and parent windows
-   */
-  static findSCORM2004API() {
-    let win = window;
-    let attempts = 0;
-    const maxAttempts = 500;
-
-    while (win && attempts < maxAttempts) {
-      attempts++;
-
-      if (win.API_1484_11) {
-        return win.API_1484_11;
-      }
-
-      if (win.parent && win.parent !== win) {
-        win = win.parent;
-      } else {
-        break;
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * Finds SCORM 1.2 API
-   * Searches current window and parent windows
-   */
-  static findSCORM12API() {
-    let win = window;
-    let attempts = 0;
-    const maxAttempts = 500;
-
-    while (win && attempts < maxAttempts) {
-      attempts++;
-
-      if (win.API) {
-        return win.API;
-      }
-
-      if (win.parent && win.parent !== win) {
-        win = win.parent;
-      } else {
-        break;
-      }
-    }
-
-    return null;
   }
 
   /**

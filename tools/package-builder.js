@@ -5,10 +5,14 @@
  * Creates SCORM 2004 4th Edition packages from course content
  */
 
-const { program } = require('commander');
-const archiver = require('archiver');
-const fs = require('fs');
-const path = require('path');
+import { program } from 'commander';
+import archiver from 'archiver';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 program
   .name('package-scorm')

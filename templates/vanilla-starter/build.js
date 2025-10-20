@@ -3,8 +3,12 @@
  * Copies files to dist folder and bundles the wrapper
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const distDir = path.join(__dirname, 'dist');
 
@@ -28,15 +32,22 @@ filesToCopy.forEach(file => {
   }
 });
 
-// Copy the wrapper library
-const wrapperSrc = path.join(__dirname, '..', '..', 'dist', 'scorm-wrapper.esm.js');
+// Copy the wrapper library from node_modules
+const wrapperSrc = path.join(__dirname, 'node_modules', 'scorm-xapi-wrapper', 'dist', 'scorm-wrapper.esm.js');
 const wrapperDest = path.join(distDir, 'scorm-wrapper.esm.js');
 
 if (fs.existsSync(wrapperSrc)) {
   fs.copyFileSync(wrapperSrc, wrapperDest);
   console.log('✓ Copied SCORM wrapper');
 } else {
-  console.warn('Warning: SCORM wrapper not found. Run npm run build in root directory first.');
+  // Try looking in the parent directory for local development
+  const localWrapperSrc = path.join(__dirname, '..', '..', 'dist', 'scorm-wrapper.esm.js');
+  if (fs.existsSync(localWrapperSrc)) {
+    fs.copyFileSync(localWrapperSrc, wrapperDest);
+    console.log('✓ Copied SCORM wrapper (from local build)');
+  } else {
+    console.warn('Warning: SCORM wrapper not found. Make sure scorm-xapi-wrapper is installed.');
+  }
 }
 
 // Copy course.js and update import path

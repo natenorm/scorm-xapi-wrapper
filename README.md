@@ -15,30 +15,42 @@ A framework-agnostic JavaScript library for building SCORM 2004 and xAPI-complia
 
 ## Quick Start
 
-### Option 1: Use a Template (Recommended)
+### Local Development (Current Setup)
 
-Create a new course from a template with one command:
+This package works locally without publishing to npm!
 
+**Option 1: Copy a Template**
 ```bash
-# Choose your template:
-./setup-vanilla.sh my-course     # HTML/CSS/JavaScript
-./setup-react.sh my-course       # React with Vite
-./setup-vue.sh my-course         # Vue 3 with Vite
-```
-
-Then:
-
-```bash
-cd ../my-course
+# From the SCORM Wrapper directory:
+cp -r templates/vanilla-starter ~/my-new-course
+cd ~/my-new-course
 npm install
 npm run dev          # Start development server
-npm run package      # Create SCORM package
+npm run package      # Create SCORM ZIP for LMS
 ```
 
-### Option 2: Install in Existing Project
+**Option 2: Use npm link (Recommended)**
+```bash
+# In the SCORM Wrapper directory:
+npm run build        # Build the wrapper
+npm link             # Create global symlink
+
+# In your new course directory:
+npm init -y
+npm link scorm-xapi-wrapper  # Link to local wrapper
+# Then use the wrapper as normal in your code
+```
+
+**Option 3: Direct File Reference**
+Templates use `"scorm-xapi-wrapper": "file:../.."` to reference the local build. You can copy this approach.
+
+### After Publishing to npm
 
 ```bash
-npm install scorm-xapi-wrapper
+npx create-scorm-course my-course
+cd my-course
+npm install
+npm run dev
 ```
 
 ## Usage

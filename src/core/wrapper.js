@@ -5,6 +5,7 @@
 
 import { EnvironmentDetector } from './detector.js';
 import { SCORM2004Adapter } from '../adapters/scorm2004.js';
+import { SCORM12Adapter } from '../adapters/scorm12.js';
 import { XAPIAdapter } from '../adapters/xapi.js';
 import { LocalStorageAdapter } from './storage.js';
 
@@ -25,14 +26,16 @@ class ScormWrapperClass {
       return true;
     }
 
-    // Detect environment
+    // Detect environment (synchronous - API is immediately available)
     this.environment = EnvironmentDetector.detect();
-    console.log(`[Wrapper] Detected environment: ${this.environment.type}`);
 
     // Create appropriate adapter
     switch (this.environment.type) {
       case 'scorm2004':
         this.adapter = new SCORM2004Adapter(this.environment.api);
+        break;
+      case 'scorm12':
+        this.adapter = new SCORM12Adapter(this.environment.api);
         break;
       case 'xapi':
         this.adapter = new XAPIAdapter(this.environment.api);
@@ -73,10 +76,11 @@ class ScormWrapperClass {
 
   /**
    * Mark course as complete
+   * @param {boolean} passed - Whether the learner passed (default: true)
    */
-  async setComplete() {
+  async setComplete(passed = true) {
     this.ensureInitialized();
-    return await this.adapter.setComplete();
+    return await this.adapter.setComplete(passed);
   }
 
   /**
@@ -159,9 +163,16 @@ class ScormWrapperClass {
    * @private
    */
   setupAutoTerminate() {
+    // Use pagehide instead of beforeunload - more reliable in iframes
+    window.addEventListener('pagehide', () => {
+      if (this.initialized) {
+        this.terminate();
+      }
+    });
+    
+    // Fallback to beforeunload
     window.addEventListener('beforeunload', () => {
       if (this.initialized) {
-        // Use synchronous termination for unload
         this.terminate();
       }
     });
@@ -169,6 +180,13 @@ class ScormWrapperClass {
     // Also handle visibility change for mobile
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden' && this.initialized) {
+        this.terminate();
+      }
+    });
+    
+    // Try unload as last resort
+    window.addEventListener('unload', () => {
+      if (this.initialized) {
         this.terminate();
       }
     });

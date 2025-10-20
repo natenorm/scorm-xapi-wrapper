@@ -7,12 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "package": "npm run build && node ../../tools/package-builder.js -i dist -o course.zip"
+    "package": "npm run build && npx package-scorm -i dist -o course.zip --title 'My React SCORM Course'"
   },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "scorm-xapi-wrapper": "file:../.."
+    "scorm-xapi-wrapper": "^1.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

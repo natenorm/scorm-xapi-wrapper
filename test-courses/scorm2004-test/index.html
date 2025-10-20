@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCORM 2004 Comprehensive Test</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>SCORM 2004 Comprehensive Test</h1>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressBar"></div>
+      </div>
+      <p class="progress-text" id="progressText">Page 1 of 5</p>
+    </header>
+
+    <!-- Main Content -->
+    <main id="content">
+      <!-- Pages will be dynamically shown here -->
+    </main>
+
+    <!-- Navigation -->
+    <nav class="navigation">
+      <button id="prevBtn" onclick="previousPage()">← Previous</button>
+      <button id="nextBtn" onclick="nextPage()">Next →</button>
+      <button id="completeBtn" onclick="completeCourse()" style="display:none;">Complete Course</button>
+    </nav>
+
+    <!-- Debug Panel -->
+    <div class="debug-panel">
+      <h3>🔍 Debug Information</h3>
+      <div class="debug-section">
+        <strong>Environment:</strong>
+        <span id="envType">Detecting...</span>
+      </div>
+      <div class="debug-section">
+        <strong>Current Page:</strong>
+        <span id="debugPage">1</span>
+      </div>
+      <div class="debug-section">
+        <strong>Quiz Answers:</strong>
+        <span id="debugAnswers">None</span>
+      </div>
+      <div class="debug-section">
+        <strong>Quiz Score:</strong>
+        <span id="debugScore">Not taken</span>
+      </div>
+      <div class="debug-section">
+        <strong>Completion Status:</strong>
+        <span id="debugCompletion">Not complete</span>
+      </div>
+      <div class="debug-section">
+        <strong>Data Saved:</strong>
+        <span id="debugSaved">No</span>
+      </div>
+      <div class="debug-actions">
+        <button onclick="loadSavedData()">🔄 Load Data</button>
+        <button onclick="clearAllData()">🗑️ Clear Data</button>
+        <button onclick="manualExit()" style="background: #f39c12;">💾 Save & Exit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Templates -->
+  <template id="page1">
+    <div class="page">
+      <h2>Page 1: Welcome & Introduction</h2>
+      <div class="content-box">
+        <h3>Welcome to the SCORM 2004 Test Course</h3>
+        <p>This course demonstrates:</p>
+        <ul>
+          <li>✅ Progress tracking across multiple pages</li>
+          <li>✅ Resume functionality (close and reopen)</li>
+          <li>✅ Quiz with scoring</li>
+          <li>✅ Data persistence in SCORM/LMS</li>
+          <li>✅ Completion based on quiz results</li>
+        </ul>
+        <div class="info-box">
+          <strong>Instructions:</strong>
+          <p>Navigate through the pages, take the quiz on Page 4, and complete the course on Page 5.</p>
+          <p><strong>To test resume:</strong> Navigate partway through, close the window, then relaunch. You should return to where you left off.</p>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="page2">
+    <div class="page">
+      <h2>Page 2: SCORM Basics</h2>
+      <div class="content-box">
+        <h3>What is SCORM?</h3>
+        <p><strong>SCORM</strong> (Sharable Content Object Reference Model) is a set of technical standards for e-learning software products.</p>
+        
+        <h4>Key Features:</h4>
+        <ul>
+          <li><strong>Interoperability:</strong> Content works across different LMS platforms</li>
+          <li><strong>Reusability:</strong> Content can be reused in different contexts</li>
+          <li><strong>Tracking:</strong> Progress, scores, and completion are tracked</li>
+          <li><strong>Packaging:</strong> Standard ZIP format with manifest file</li>
+        </ul>
+
+        <div class="info-box">
+          <strong>This page demonstrates:</strong>
+          <p>Progress is automatically saved when you navigate. Your location is stored in <code>cmi.location</code> and your data in <code>cmi.suspend_data</code>.</p>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="page3">
+    <div class="page">
+      <h2>Page 3: Data Storage</h2>
+      <div class="content-box">
+        <h3>How SCORM Stores Data</h3>
+        <p>SCORM uses the CMI (Computer Managed Instruction) data model to store information:</p>
+        
+        <table class="data-table">
+          <tr>
+            <th>Element</th>
+            <th>Purpose</th>
+            <th>Example</th>
+          </tr>
+          <tr>
+            <td><code>cmi.location</code></td>
+            <td>Current position</td>
+            <td>"page3"</td>
+          </tr>
+          <tr>
+            <td><code>cmi.suspend_data</code></td>
+            <td>Custom data (4000 chars)</td>
+            <td>JSON string</td>
+          </tr>
+          <tr>
+            <td><code>cmi.completion_status</code></td>
+            <td>Completion state</td>
+            <td>"incomplete" or "completed"</td>
+          </tr>
+          <tr>
+            <td><code>cmi.success_status</code></td>
+            <td>Pass/fail</td>
+            <td>"passed" or "failed"</td>
+          </tr>
+          <tr>
+            <td><code>cmi.score.scaled</code></td>
+            <td>Score (0-1)</td>
+            <td>0.85</td>
+          </tr>
+        </table>
+
+        <div class="info-box">
+          <strong>Test this:</strong>
+          <p>Check the debug panel at the bottom. You'll see your current page is being tracked. Try closing and reopening to see resume in action!</p>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="page4">
+    <div class="page">
+      <h2>Page 4: Quiz</h2>
+      <div class="content-box">
+        <h3>Test Your Knowledge</h3>
+        <p>Answer these questions about SCORM. You need 70% or higher to pass.</p>
+
+        <div class="quiz-question">
+          <p><strong>1. What does SCORM stand for?</strong></p>
+          <label><input type="radio" name="q1" value="A"> A) Sharable Content Object Reference Model</label>
+          <label><input type="radio" name="q1" value="B"> B) Standard Course Object Resource Model</label>
+          <label><input type="radio" name="q1" value="C"> C) Simple Content Organization Reference</label>
+          <label><input type="radio" name="q1" value="D"> D) Structured Course Online Repository</label>
+        </div>
+
+        <div class="quiz-question">
+          <p><strong>2. Which element stores custom course data?</strong></p>
+          <label><input type="radio" name="q2" value="A"> A) cmi.location</label>
+          <label><input type="radio" name="q2" value="B"> B) cmi.suspend_data</label>
+          <label><input type="radio" name="q2" value="C"> C) cmi.completion_status</label>
+          <label><input type="radio" name="q2" value="D"> D) cmi.score</label>
+        </div>
+
+        <div class="quiz-question">
+          <p><strong>3. What is the SCORM 2004 API object name?</strong></p>
+          <label><input type="radio" name="q3" value="A"> A) API</label>
+          <label><input type="radio" name="q3" value="B"> B) API_1484_11</label>
+          <label><input type="radio" name="q3" value="C"> C) SCORM_API</label>
+          <label><input type="radio" name="q3" value="D"> D) LMS_API</label>
+        </div>
+
+        <div class="quiz-question">
+          <p><strong>4. What format is used for SCORM packages?</strong></p>
+          <label><input type="radio" name="q4" value="A"> A) TAR archive</label>
+          <label><input type="radio" name="q4" value="B"> B) ZIP file with imsmanifest.xml</label>
+          <label><input type="radio" name="q4" value="C"> C) ISO image</label>
+          <label><input type="radio" name="q4" value="D"> D) PDF document</label>
+        </div>
+
+        <div class="quiz-question">
+          <p><strong>5. What does cmi.success_status indicate?</strong></p>
+          <label><input type="radio" name="q5" value="A"> A) Whether the course is complete</label>
+          <label><input type="radio" name="q5" value="B"> B) Whether the learner passed or failed</label>
+          <label><input type="radio" name="q5" value="C"> C) The current page number</label>
+          <label><input type="radio" name="q5" value="D"> D) The time spent in course</label>
+        </div>
+
+        <button onclick="gradeQuiz()" class="btn-primary">Submit Quiz</button>
+        
+        <div id="quizResults" style="display:none;" class="quiz-results"></div>
+      </div>
+    </div>
+  </template>
+
+  <template id="page5">
+    <div class="page">
+      <h2>Page 5: Results & Completion</h2>
+      <div class="content-box" id="resultsContent">
+        <h3>Course Complete!</h3>
+        <p>Thank you for completing the SCORM 2004 test course.</p>
+        
+        <div class="results-box">
+          <h4>Your Results:</h4>
+          <p><strong>Quiz Score:</strong> <span id="finalScore">Not taken</span></p>
+          <p><strong>Status:</strong> <span id="finalStatus">Incomplete</span></p>
+        </div>
+
+        <div class="info-box">
+          <strong>What happens when you click "Complete Course":</strong>
+          <ul>
+            <li>Sets <code>cmi.completion_status = "completed"</code></li>
+            <li>Sets <code>cmi.success_status</code> based on your score (passed/failed)</li>
+            <li>Commits all data to the LMS</li>
+            <li>LMS will record your completion</li>
+          </ul>
+        </div>
+
+        <p class="note"><strong>Note:</strong> In a real course, this would be the final step. After completing, you typically can't change your score.</p>
+      </div>
+    </div>
+  </template>
+
+  <script type="module" src="course.js"></script>
+</body>
+</html>
+
+

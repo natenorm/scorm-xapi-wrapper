@@ -12,7 +12,16 @@ export class LocalStorageAdapter {
   async initialize() {
     console.log('[LocalStorage] Running in local development mode');
     this.initialized = true;
+    
+    // Clear any old scorm data from different environments
+    this.clearOtherEnvironmentData();
+    
     return true;
+  }
+  
+  clearOtherEnvironmentData() {
+    // When using localStorage mode, we don't need to clear anything
+    // This is just for consistency with other adapters
   }
 
   async saveProgress(data) {

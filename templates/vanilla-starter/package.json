@@ -1,14 +1,15 @@
 {
   "name": "vanilla-scorm-course",
   "version": "1.0.0",
+  "type": "module",
   "description": "Vanilla JavaScript SCORM course",
   "scripts": {
-    "dev": "npx http-server . -p 8080 -o",
+    "dev": "npm run build && npx http-server dist -p 8080 -o",
     "build": "node build.js",
-    "package": "npm run build && node ../../tools/package-builder.js -i dist -o course.zip"
+    "package": "npm run build && npx package-scorm -i dist -o course.zip --title 'My SCORM Course'"
   },
   "dependencies": {
-    "scorm-xapi-wrapper": "file:../.."
+    "scorm-xapi-wrapper": "^1.0.0"
   },
   "devDependencies": {
     "http-server": "^14.1.1"

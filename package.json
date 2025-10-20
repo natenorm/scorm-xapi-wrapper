@@ -2,7 +2,7 @@
   "name": "scorm-xapi-wrapper",
   "version": "1.0.0",
   "type": "module",
-  "description": "Framework-agnostic SCORM 2004 and xAPI wrapper for custom e-learning content",
+  "description": "Framework-agnostic SCORM 2004 and xAPI wrapper - build custom e-learning courses with any web technology. Optimized for Cursor AI development.",
   "main": "dist/scorm-wrapper.cjs.js",
   "module": "dist/scorm-wrapper.esm.js",
   "browser": "dist/scorm-wrapper.umd.js",
@@ -11,7 +11,11 @@
     "dist",
     "types",
     "templates",
-    "tools"
+    "tools",
+    "cli.js",
+    "README.md",
+    "QUICKSTART.md",
+    "CURSOR_AI_GUIDE.md"
   ],
   "scripts": {
     "build": "rollup -c",
@@ -25,6 +29,7 @@
   "keywords": [
     "scorm",
     "scorm2004",
+    "scorm-1.2",
     "xapi",
     "tin-can",
     "elearning",
@@ -33,9 +38,15 @@
     "course-builder",
     "create-scorm-course",
     "e-learning",
-    "training"
+    "training",
+    "cursor-ai",
+    "ai-assisted",
+    "education",
+    "moodle",
+    "canvas",
+    "blackboard"
   ],
-  "author": "Your Name <your@email.com>",
+  "author": "Nathan",
   "license": "MIT",
   "repository": {
     "type": "git",

@@ -14,11 +14,13 @@ export class SCORM2004Adapter {
       const result = this.api.Initialize('');
       if (result === 'true') {
         this.initialized = true;
-        console.log('[SCORM 2004] Initialized successfully');
+        
+        // Clear any localStorage that might interfere from local testing
+        this.clearLocalStorageData();
         
         // Set initial status if not already set
-        const status = this.api.GetValue('cmi.completion_status');
-        if (status === 'unknown' || status === 'not attempted') {
+        const completionStatus = this.api.GetValue('cmi.completion_status');
+        if (completionStatus === 'unknown' || completionStatus === 'not attempted') {
           this.api.SetValue('cmi.completion_status', 'incomplete');
           this.api.Commit('');
         }
@@ -30,6 +32,22 @@ export class SCORM2004Adapter {
     } catch (error) {
       console.error('[SCORM 2004] Initialization error:', error);
       throw error;
+    }
+  }
+  
+  clearLocalStorageData() {
+    // Clear any localStorage from local testing to prevent conflicts
+    try {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('scorm')) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+    } catch (error) {
+      // Ignore localStorage errors (might be blocked in some LMS iframes)
     }
   }
 
@@ -44,7 +62,7 @@ export class SCORM2004Adapter {
       
       // SCORM 2004 suspend_data limit is 64,000 characters
       if (serialized.length > 64000) {
-        console.warn('[SCORM 2004] Data exceeds 64KB limit, truncating...');
+        console.warn('[SCORM 2004] Data exceeds 64KB limit');
       }
       
       this.api.SetValue('cmi.suspend_data', serialized);
@@ -58,7 +76,6 @@ export class SCORM2004Adapter {
       const result = this.api.Commit('');
       
       if (result === 'true') {
-        console.log('[SCORM 2004] Progress saved successfully');
         return true;
       } else {
         throw new Error(this.getLastError());
@@ -81,28 +98,33 @@ export class SCORM2004Adapter {
         return null;
       }
       
-      const data = JSON.parse(suspendData);
-      console.log('[SCORM 2004] Progress loaded');
-      return data;
+      return JSON.parse(suspendData);
     } catch (error) {
       console.error('[SCORM 2004] Error loading progress:', error);
       return null;
     }
   }
 
-  async setComplete() {
+  async setComplete(passed = true) {
     if (!this.initialized) {
       throw new Error('SCORM API not initialized');
     }
 
     try {
-      this.api.SetValue('cmi.completion_status', 'completed');
-      this.api.SetValue('cmi.success_status', 'passed');
+      // Only mark complete if not already completed
+      const currentStatus = this.api.GetValue('cmi.completion_status');
+      if (currentStatus === 'completed') {
+        return true;
+      }
       
+      // Set completion and success status
+      this.api.SetValue('cmi.completion_status', 'completed');
+      this.api.SetValue('cmi.success_status', passed ? 'passed' : 'failed');
+      
+      // Commit immediately
       const result = this.api.Commit('');
       
       if (result === 'true') {
-        console.log('[SCORM 2004] Course marked as complete');
         return true;
       } else {
         throw new Error(this.getLastError());
@@ -130,7 +152,6 @@ export class SCORM2004Adapter {
       const result = this.api.Commit('');
       
       if (result === 'true') {
-        console.log('[SCORM 2004] Score set:', score);
         return true;
       } else {
         throw new Error(this.getLastError());
@@ -147,10 +168,19 @@ export class SCORM2004Adapter {
     }
 
     try {
+      // Set exit mode to "suspend" ONLY for incomplete courses
+      // Completed courses should NOT set exit mode (let LMS use default behavior)
+      const completionStatus = this.api.GetValue('cmi.completion_status');
+      if (completionStatus !== 'completed') {
+        this.api.SetValue('cmi.exit', 'suspend');
+      }
+      
+      // Final commit before terminating
+      this.api.Commit('');
+      
       const result = this.api.Terminate('');
       
       if (result === 'true') {
-        console.log('[SCORM 2004] Terminated successfully');
         this.initialized = false;
         return true;
       } else {

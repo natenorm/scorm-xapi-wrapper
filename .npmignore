@@ -1,4 +1,5 @@
-# Don't publish these to npm
+# Development files
+node_modules/
 examples/
 src/
 *.log
@@ -6,9 +7,15 @@ src/
 rollup.config.js
 setup-*.sh
 
-# Keep these for documentation reference
-!README.md
-!GETTING_STARTED.md
-!QUICK_REFERENCE.md
-!BEGINNER_GUIDE.md
+# Documentation (keep only essential)
+QUICK_REFERENCE.md
 
+# Keep these
+!README.md
+!QUICKSTART.md
+!CURSOR_AI_GUIDE.md
+!dist/
+!types/
+!templates/
+!tools/
+!cli.js
