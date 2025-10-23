@@ -15,8 +15,8 @@ if (fs.existsSync(distDir)) {
 // Create dist directory
 fs.mkdirSync(distDir, { recursive: true });
 
-// Copy HTML, CSS, JS files
-const filesToCopy = ['index.html', 'styles.css', 'course.js'];
+// Copy HTML, CSS, JS files, and SCORM manifest
+const filesToCopy = ['index.html', 'styles.css', 'course.js', 'imsmanifest.xml'];
 
 filesToCopy.forEach(file => {
   const src = path.join(__dirname, file);
