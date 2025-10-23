@@ -52,10 +52,18 @@ export class XAPIAdapter {
             actor.account = actor.account[0]; // Take first element
         }
 
-        // Rename accountServiceHomePage to homePage (xAPI spec)
-        if (actor.account && actor.account.accountServiceHomePage) {
-            actor.account.homePage = actor.account.accountServiceHomePage;
-            delete actor.account.accountServiceHomePage;
+        // Normalize account object to xAPI spec
+        if (actor.account) {
+            // Rename accountServiceHomePage to homePage
+            if (actor.account.accountServiceHomePage) {
+                actor.account.homePage = actor.account.accountServiceHomePage;
+                delete actor.account.accountServiceHomePage;
+            }
+            // Rename accountName to name
+            if (actor.account.accountName) {
+                actor.account.name = actor.account.accountName;
+                delete actor.account.accountName;
+            }
         }
 
         // For local development, we can work without endpoint/auth
