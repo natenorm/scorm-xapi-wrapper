@@ -347,8 +347,11 @@ function showFinalResults() {
 
 // xAPI statement helper
 async function sendStatement(verb, objectName, context = {}) {
+    // Get normalized actor from wrapper (fixes SCORM Cloud's array format)
+    const actor = wrapper.getActor() || window.xAPIConfig.actor;
+    
     const statement = {
-        actor: window.xAPIConfig.actor,
+        actor: actor,
         verb: {
             id: `http://adlnet.gov/expapi/verbs/${verb}`,
             display: { 'en-US': verb }

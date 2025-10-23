@@ -214,6 +214,18 @@ class ScormWrapperClass {
   }
 
   /**
+   * Get normalized actor object (xAPI only)
+   * @returns {Object|null} Normalized actor or null if not xAPI
+   */
+  getActor() {
+    this.ensureInitialized();
+    if (this.adapter && typeof this.adapter.getActor === 'function') {
+      return this.adapter.getActor();
+    }
+    return null;
+  }
+
+  /**
    * Ensure wrapper is initialized
    * @private
    */
