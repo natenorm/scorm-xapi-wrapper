@@ -255,8 +255,9 @@ export class XAPIAdapter {
 
     /**
      * Mark course as complete
+     * @param {boolean} success - Whether the learner succeeded (passed)
      */
-    async setComplete() {
+    async setComplete(success = true) {
         const statement = {
             id: this.generateDeterministicUUID('completed'),
             actor: this.config.actor,
@@ -269,6 +270,10 @@ export class XAPIAdapter {
                 definition: {
                     type: 'http://adlnet.gov/expapi/activities/course'
                 }
+            },
+            result: {
+                completion: true,
+                success: success
             },
             context: {
                 registration: this.registrationId

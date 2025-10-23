@@ -316,13 +316,16 @@ window.gradeQuiz = async function() {
 async function completeCourse() {
     courseData.completed = true;
     
-    // Mark as complete in wrapper
-    await wrapper.setComplete();
+    // Determine success based on quiz score (pass = 80% or higher)
+    const success = courseData.quizScore >= 80;
+    
+    // Mark as complete in wrapper (with success status)
+    await wrapper.setComplete(success);
     
     // Send completion statement
     await sendStatement('completed', 'xAPI Test Course', {
         duration: 'PT5M', // ISO 8601 duration (example: 5 minutes)
-        success: courseData.quizScore >= 80
+        success: success
     });
     
     await wrapper.saveProgress(courseData);
