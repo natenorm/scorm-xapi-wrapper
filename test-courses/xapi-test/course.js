@@ -13,54 +13,82 @@ const courseData = {
     statementCount: 0
 };
 
-// Initialize the wrapper
-console.log('[Course] Initializing...');
-console.log('[Course] Initial courseData:', courseData);
+// Helper: Generate UUID
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
 
-// xAPI configuration (these would typically come from your LMS/LRS)
-const xapiConfig = {
-    endpoint: 'https://cloud.scorm.com/lrs/your-endpoint',
-    auth: 'Basic your-auth-token',
+// xAPI configuration (these would typically come from your LMS/LRS via URL parameters)
+// For local development, we'll set up a global config
+// In production, this would come from LRS launch parameters
+window.xAPIConfig = {
+    // endpoint: 'https://your-lrs.com/data/xAPI', // Uncomment for real LRS
+    // auth: 'Basic your-base64-credentials',      // Uncomment for real LRS
     actor: {
         name: 'Test User',
         mbox: 'mailto:test@example.com'
-    }
+    },
+    activityId: 'http://example.com/activities/xapi-test-course',
+    registration: generateUUID()
 };
 
 const wrapper = new ScormWrapper();
-wrapper.initialize();
+let envType = 'local'; // Default to local
 
-console.log('[Course] Wrapper initialized');
-const envType = wrapper.getEnvironmentType();
-console.log('[Course] Environment type:', envType);
+// Initialize course
+(async function initCourse() {
+    console.log('[Course] Initializing...');
+    console.log('[Course] Initial courseData:', courseData);
 
-// Load saved data
-const savedData = wrapper.getProgress();
-console.log('[Course] Loaded saved data:', savedData);
-if (savedData && Object.keys(savedData).length > 0) {
-    console.log('[Course] Resuming from saved data - currentPage:', savedData.currentPage);
-    console.log('[Course] Before merge, courseData.currentPage:', courseData.currentPage);
-    Object.assign(courseData, savedData);
-    console.log('[Course] After merge, courseData.currentPage:', courseData.currentPage);
-}
+    try {
+        await wrapper.initialize();
+        console.log('[Course] Wrapper initialized');
+        envType = wrapper.getEnvironmentType();
+        console.log('[Course] Environment type:', envType);
+        
+        // If xAPI mode, we can access the config
+        if (envType === 'xapi') {
+            console.log('[Course] xAPI mode active - statements will be sent to LRS');
+        } else {
+            console.log('[Course] Local mode active - using localStorage');
+        }
+    } catch (error) {
+        console.error('[Course] Initialization error:', error);
+        // Continue with local mode
+    }
 
-// Update UI with loaded data
-updateUI();
-console.log('[Course] About to show page:', courseData.currentPage);
-showPage(courseData.currentPage);
+    // Load saved data
+    const savedData = await wrapper.getProgress();
+    console.log('[Course] Loaded saved data:', savedData);
+    if (savedData && Object.keys(savedData).length > 0) {
+        console.log('[Course] Resuming from saved data - currentPage:', savedData.currentPage);
+        console.log('[Course] Before merge, courseData.currentPage:', courseData.currentPage);
+        Object.assign(courseData, savedData);
+        console.log('[Course] After merge, courseData.currentPage:', courseData.currentPage);
+    }
 
-// Save progress
-wrapper.saveProgress(courseData);
-console.log('[Course] Initialization complete. Final courseData:', courseData);
+    // Update UI with loaded data
+    updateUI();
+    console.log('[Course] About to show page:', courseData.currentPage);
+    showPage(courseData.currentPage);
 
-// Send initial statement
-sendStatement('experienced', 'Launched the xAPI test course');
+    // Save progress
+    await wrapper.saveProgress(courseData);
+    console.log('[Course] Initialization complete. Final courseData:', courseData);
 
-// Update debug panel
-updateDebugPanel();
+    // Send initial statement
+    await sendStatement('experienced', 'Launched the xAPI test course');
+
+    // Update debug panel
+    updateDebugPanel();
+})();
 
 // Navigation functions
-window.nextPage = function() {
+window.nextPage = async function() {
     if (courseData.currentPage < courseData.totalPages) {
         // If on quiz page and not graded, don't allow next
         if (courseData.currentPage === 4 && !courseData.quizGraded) {
@@ -73,30 +101,30 @@ window.nextPage = function() {
             courseData.visitedPages.push(courseData.currentPage);
         }
         showPage(courseData.currentPage);
-        wrapper.saveProgress(courseData);
+        await wrapper.saveProgress(courseData);
         console.log('[Course] Progress saved:', courseData);
         
         // Send page view statement
-        sendStatement('experienced', `Viewed page ${courseData.currentPage}`);
+        await sendStatement('experienced', `Viewed page ${courseData.currentPage}`);
         
         // Check if reached final page
         if (courseData.currentPage === courseData.totalPages && !courseData.completed) {
-            completeCourse();
+            await completeCourse();
         }
         
         updateDebugPanel();
     }
 };
 
-window.prevPage = function() {
+window.prevPage = async function() {
     if (courseData.currentPage > 1) {
         courseData.currentPage--;
         showPage(courseData.currentPage);
-        wrapper.saveProgress(courseData);
+        await wrapper.saveProgress(courseData);
         console.log('[Course] Progress saved (prev):', courseData);
         
         // Send page view statement
-        sendStatement('experienced', `Viewed page ${courseData.currentPage}`);
+        await sendStatement('experienced', `Viewed page ${courseData.currentPage}`);
         
         updateDebugPanel();
     }
@@ -136,7 +164,7 @@ function updateUI() {
 }
 
 // Interaction tracking
-window.trackInteraction = function(interactionType) {
+window.trackInteraction = async function(interactionType) {
     courseData.interactions.push({
         type: interactionType,
         timestamp: new Date().toISOString()
@@ -157,7 +185,7 @@ window.trackInteraction = function(interactionType) {
         'downloaded-resource': 'course resource'
     };
     
-    sendStatement(
+    await sendStatement(
         verbs[interactionType] || 'interacted',
         objects[interactionType] || 'content'
     );
@@ -169,12 +197,12 @@ window.trackInteraction = function(interactionType) {
         feedback.style.display = 'none';
     }, 3000);
     
-    wrapper.saveProgress(courseData);
+    await wrapper.saveProgress(courseData);
     updateDebugPanel();
 };
 
 // Quiz functions
-window.gradeQuiz = function() {
+window.gradeQuiz = async function() {
     const answers = {
         q1: document.querySelector('input[name="q1"]:checked')?.value,
         q2: document.querySelector('input[name="q2"]:checked')?.value,
@@ -208,7 +236,7 @@ window.gradeQuiz = function() {
         }
         
         // Send answer statement for each question
-        sendStatement(
+        await sendStatement(
             'answered',
             `Question ${q}`,
             {
@@ -222,8 +250,8 @@ window.gradeQuiz = function() {
     courseData.quizGraded = true;
     
     // Report score to LRS
-    wrapper.setScore(courseData.quizScore, 0, 100);
-    sendStatement('scored', 'Quiz', {
+    await wrapper.setScore(courseData.quizScore, 0, 100);
+    await sendStatement('scored', 'Quiz', {
         score: {
             scaled: correct / 5,
             raw: correct,
@@ -243,25 +271,25 @@ window.gradeQuiz = function() {
     resultsDiv.style.display = 'block';
     
     // Save progress
-    wrapper.saveProgress(courseData);
+    await wrapper.saveProgress(courseData);
     console.log('[Course] Quiz graded. Score:', courseData.quizScore);
     
     updateDebugPanel();
 };
 
-function completeCourse() {
+async function completeCourse() {
     courseData.completed = true;
     
     // Mark as complete in wrapper
-    wrapper.setComplete();
+    await wrapper.setComplete();
     
     // Send completion statement
-    sendStatement('completed', 'xAPI Test Course', {
+    await sendStatement('completed', 'xAPI Test Course', {
         duration: 'PT5M', // ISO 8601 duration (example: 5 minutes)
         success: courseData.quizScore >= 80
     });
     
-    wrapper.saveProgress(courseData);
+    await wrapper.saveProgress(courseData);
     console.log('[Course] Course completed!');
     
     updateDebugPanel();
@@ -282,45 +310,43 @@ function showFinalResults() {
 }
 
 // xAPI statement helper
-function sendStatement(verb, objectName, context = {}) {
+async function sendStatement(verb, objectName, context = {}) {
     const statement = {
-        actor: xapiConfig.actor,
+        actor: window.xAPIConfig.actor,
         verb: {
             id: `http://adlnet.gov/expapi/verbs/${verb}`,
             display: { 'en-US': verb }
         },
         object: {
-            id: `https://example.com/course/xapi-test/${objectName.replace(/\s+/g, '-').toLowerCase()}`,
+            id: `${window.xAPIConfig.activityId}/${objectName.replace(/\s+/g, '-').toLowerCase()}`,
             definition: {
                 name: { 'en-US': objectName },
-                type: 'http://adlnet.gov/expapi/activities/course'
+                type: 'http://adlnet.gov/expapi/activities/interaction'
             }
         },
-        timestamp: new Date().toISOString()
+        context: {
+            registration: window.xAPIConfig.registration
+        }
     };
     
-    // Add context if provided
+    // Add result/context if provided
     if (Object.keys(context).length > 0) {
         statement.result = context;
     }
     
     courseData.statementCount++;
     
-    console.log('[xAPI] Statement:', statement);
+    console.log('[Course] Sending statement:', verb, objectName);
+    
+    // Send via wrapper (works for both xAPI and local modes)
+    try {
+        await wrapper.sendStatement(statement);
+    } catch (error) {
+        console.warn('[Course] Could not send statement (normal in local mode):', error.message);
+    }
     
     // Add to statements list in UI
     addStatementToUI(verb, objectName);
-    
-    // In a real LRS environment, this would send via HTTP:
-    // fetch(xapiConfig.endpoint + '/statements', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Authorization': xapiConfig.auth,
-    //         'Content-Type': 'application/json',
-    //         'X-Experience-API-Version': '1.0.3'
-    //     },
-    //     body: JSON.stringify(statement)
-    // });
     
     return statement;
 }
@@ -352,7 +378,8 @@ function addStatementToUI(verb, object) {
 }
 
 function updateDebugPanel() {
-    document.getElementById('debugEnv').textContent = envType || 'local';
+    const currentEnv = wrapper.getEnvironmentType() || 'local';
+    document.getElementById('debugEnv').textContent = currentEnv;
     document.getElementById('debugInit').textContent = 'Yes ✅';
     document.getElementById('debugPage').textContent = courseData.currentPage;
     document.getElementById('debugScore').textContent = 

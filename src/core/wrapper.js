@@ -38,7 +38,7 @@ class ScormWrapperClass {
         this.adapter = new SCORM12Adapter(this.environment.api);
         break;
       case 'xapi':
-        this.adapter = new XAPIAdapter(this.environment.api);
+        this.adapter = new XAPIAdapter();
         break;
       case 'local':
       default:
@@ -46,8 +46,13 @@ class ScormWrapperClass {
         break;
     }
 
-    // Initialize the adapter
-    await this.adapter.initialize();
+    // Initialize the adapter (pass config for xAPI)
+    if (this.environment.type === 'xapi') {
+      await this.adapter.initialize(this.environment.api);
+    } else {
+      await this.adapter.initialize();
+    }
+    
     this.initialized = true;
 
     // Setup auto-save on page unload
@@ -140,6 +145,22 @@ class ScormWrapperClass {
     
     console.warn('[Wrapper] getValue not supported by current adapter');
     return null;
+  }
+
+  /**
+   * Send an xAPI statement (xAPI environments only)
+   * @param {Object} statement - xAPI statement object
+   * @returns {Promise<boolean>} - Success or failure
+   */
+  async sendStatement(statement) {
+    this.ensureInitialized();
+    
+    if (this.adapter.sendStatement) {
+      return await this.adapter.sendStatement(statement);
+    }
+    
+    console.warn('[Wrapper] sendStatement only supported in xAPI environments');
+    return false;
   }
 
   /**
