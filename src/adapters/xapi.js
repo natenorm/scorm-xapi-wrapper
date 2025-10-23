@@ -30,14 +30,33 @@ export class XAPIAdapter {
             throw new Error('xAPI config is required');
         }
 
+        // Normalize endpoint (remove trailing slash)
+        let endpoint = config.endpoint || null;
+        if (endpoint && endpoint.endsWith('/')) {
+            endpoint = endpoint.slice(0, -1);
+        }
+
+        // Normalize actor (SCORM Cloud passes name as array)
+        let actor = config.actor || {
+            name: 'Test User',
+            mbox: 'mailto:test@example.com'
+        };
+        
+        // Fix actor format if name is an array
+        if (actor.name && Array.isArray(actor.name)) {
+            actor.name = actor.name[0]; // Take first element
+        }
+        
+        // Fix account if it's an array
+        if (actor.account && Array.isArray(actor.account)) {
+            actor.account = actor.account[0]; // Take first element
+        }
+
         // For local development, we can work without endpoint/auth
         this.config = {
-            endpoint: config.endpoint || null,
+            endpoint: endpoint,
             auth: config.auth || null,
-            actor: config.actor || {
-                name: 'Test User',
-                mbox: 'mailto:test@example.com'
-            },
+            actor: actor,
             activityId: config.activityId || 'http://example.com/activities/course',
             registration: config.registration || this.generateUUID()
         };
@@ -48,6 +67,7 @@ export class XAPIAdapter {
         // Check if we have a real LRS endpoint
         if (this.config.endpoint && this.config.auth) {
             console.log('[xAPI] Initializing with LRS:', this.config.endpoint);
+            console.log('[xAPI] Actor:', this.config.actor);
             this.initialized = true;
             return true;
         } else {

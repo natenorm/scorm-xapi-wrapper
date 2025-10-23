@@ -67,19 +67,30 @@ let envType = 'local'; // Default to local
 // Initialize course
 (async function initCourse() {
     console.log('[Course] Initializing...');
+    console.log('[Course] Current URL:', window.location.href);
+    console.log('[Course] URL Params:', {
+        endpoint: endpoint,
+        hasAuth: !!auth,
+        actor: actor,
+        activityId: activityId,
+        registration: registration
+    });
     console.log('[Course] Initial courseData:', courseData);
 
     try {
         await wrapper.initialize();
         console.log('[Course] Wrapper initialized');
         envType = wrapper.getEnvironmentType();
-        console.log('[Course] Environment type:', envType);
+        console.log('[Course] Environment type detected:', envType);
+        console.log('[Course] Wrapper adapter:', wrapper.adapter ? wrapper.adapter.constructor.name : 'none');
         
         // If xAPI mode, we can access the config
         if (envType === 'xapi') {
-            console.log('[Course] xAPI mode active - statements will be sent to LRS');
+            console.log('[Course] ✅ xAPI mode active - statements will be sent to LRS');
+            console.log('[Course] LRS Endpoint:', endpoint);
         } else {
-            console.log('[Course] Local mode active - using localStorage');
+            console.log('[Course] ⚠️ Local mode active - using localStorage (no LRS detected)');
+            console.log('[Course] This means xAPI parameters were NOT found in URL');
         }
     } catch (error) {
         console.error('[Course] Initialization error:', error);
