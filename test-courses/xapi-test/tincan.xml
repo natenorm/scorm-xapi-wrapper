@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <tincan xmlns="http://projecttincan.com/tincan.xsd">
     <activities>
-        <activity id="http://example.com/xapi-test-course-v2" type="http://adlnet.gov/expapi/activities/course">
+        <activity id="http://example.com/xapi-test-course-2025-10-23" type="http://adlnet.gov/expapi/activities/course">
             <name>xAPI Test Course</name>
             <description lang="en-US">xAPI Test Course demonstrating statement tracking and LRS integration</description>
             <launch lang="en-US">index.html</launch>

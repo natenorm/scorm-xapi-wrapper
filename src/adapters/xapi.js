@@ -395,43 +395,22 @@ export class XAPIAdapter {
     generateUUID() {
         // Use crypto.randomUUID if available (modern browsers)
         if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-            return crypto.randomUUID();
+            const uuid = crypto.randomUUID();
+            console.log('[xAPI] Generated UUID using crypto.randomUUID():', uuid);
+            return uuid;
         }
         
         // Fallback: UUID v4 with timestamp for extra entropy
+        console.warn('[xAPI] crypto.randomUUID() not available, using fallback');
         const timestamp = Date.now().toString(16);
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c, i) {
             // Mix in timestamp for first 8 chars
             const r = i < 8 && timestamp[i] ? 
                 parseInt(timestamp[i], 16) ^ (Math.random() * 16 | 0) :
-                Math.random() * 16 | 0;
+                16 * Math.random() | 0;
             const v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
-    }
-
-    /**
-     * Helper: Generate deterministic UUID for wrapper statements
-     * Uses registration + statement type + timestamp to avoid collisions
-     */
-    generateDeterministicUUID(statementType) {
-        const input = `${this.registrationId}-${statementType}-${Date.now()}`;
-        
-        // Simple hash function
-        let hash = 0;
-        for (let i = 0; i < input.length; i++) {
-            hash = ((hash << 5) - hash) + input.charCodeAt(i);
-            hash = hash | 0; // Convert to 32bit integer
-        }
-        
-        // Generate UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-        const hex1 = Math.abs(hash).toString(16).padStart(8, '0');
-        const hex2 = Math.abs(hash >> 8).toString(16).padStart(4, '0');
-        const hex3 = Math.abs(hash >> 16).toString(16).padStart(3, '0');
-        const hex4 = Math.random().toString(16).slice(2, 6).padStart(4, '0');
-        const timestamp = Date.now().toString(16).padStart(12, '0');
-        
-        return `${hex1.slice(0, 8)}-${hex2.slice(0, 4)}-4${hex3.slice(0, 3)}-a${hex4.slice(0, 3)}-${timestamp.slice(0, 12)}`;
     }
 
     /**
