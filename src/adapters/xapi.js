@@ -132,7 +132,10 @@ export class XAPIAdapter {
                     throw new Error(`LRS returned ${response.status}: ${errorBody}`);
                 }
 
-                console.log('[xAPI] Statement sent successfully');
+                // Log successful response details
+                const responseText = await response.text();
+                console.log('[xAPI] Statement sent successfully - Response:', response.status, responseText || '(empty body)');
+                console.log('[xAPI] Statement ID:', statement.id);
                 return true;
             } catch (error) {
                 console.error('[xAPI] Failed to send statement:', error);
