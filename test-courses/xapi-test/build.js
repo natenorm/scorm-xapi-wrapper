@@ -14,7 +14,7 @@ if (fs.existsSync(distDir)) {
 fs.mkdirSync(distDir);
 
 // Copy course files
-const filesToCopy = ['index.html', 'course.js', 'styles.css'];
+const filesToCopy = ['index.html', 'course.js', 'styles.css', 'tincan.xml'];
 
 filesToCopy.forEach(file => {
     fs.copyFileSync(
