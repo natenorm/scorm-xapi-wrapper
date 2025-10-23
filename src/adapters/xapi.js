@@ -424,12 +424,14 @@ export class XAPIAdapter {
             hash = hash | 0; // Convert to 32bit integer
         }
         
-        // Convert hash to UUID format
-        const hex = Math.abs(hash).toString(16).padStart(8, '0');
+        // Generate UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+        const hex1 = Math.abs(hash).toString(16).padStart(8, '0');
+        const hex2 = Math.abs(hash >> 8).toString(16).padStart(4, '0');
+        const hex3 = Math.abs(hash >> 16).toString(16).padStart(3, '0');
+        const hex4 = Math.random().toString(16).slice(2, 6).padStart(4, '0');
         const timestamp = Date.now().toString(16).padStart(12, '0');
-        const random = Math.random().toString(16).slice(2, 6);
         
-        return `${hex.slice(0, 8)}-${timestamp.slice(0, 4)}-4${timestamp.slice(4, 7)}-a${random}-${timestamp.slice(7, 19)}`;
+        return `${hex1.slice(0, 8)}-${hex2.slice(0, 4)}-4${hex3.slice(0, 3)}-a${hex4.slice(0, 3)}-${timestamp.slice(0, 12)}`;
     }
 
     /**
