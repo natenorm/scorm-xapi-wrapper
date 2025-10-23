@@ -1,0 +1,18 @@
+{
+  "name": "xapi-test-course",
+  "version": "1.0.0",
+  "description": "xAPI test course for scorm-xapi-wrapper",
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "npm run build && npx http-server dist -p 8080 -o -c-1",
+    "package": "npm run build && cd dist && zip -r ../xapi-test.zip ."
+  },
+  "dependencies": {
+    "scorm-xapi-wrapper": "file:../.."
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
+

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xAPI Test Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>xAPI Test Course</h1>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <p class="page-counter">Page <span id="currentPage">1</span> of <span id="totalPages">5</span></p>
+        </header>
+
+        <main>
+            <!-- Page 1: Introduction -->
+            <div class="page" id="page1">
+                <h2>Welcome to the xAPI Test Course!</h2>
+                <p>This course demonstrates the xAPI (Experience API) capabilities of the scorm-xapi-wrapper.</p>
+                <h3>What We'll Test:</h3>
+                <ul>
+                    <li>✅ <strong>xAPI Initialization</strong> - Connecting to the LRS</li>
+                    <li>✅ <strong>Statement Tracking</strong> - Sending experience statements</li>
+                    <li>✅ <strong>Progress Persistence</strong> - Saving/loading state</li>
+                    <li>✅ <strong>Completion Tracking</strong> - Course completion statements</li>
+                    <li>✅ <strong>Score Reporting</strong> - Quiz results via xAPI</li>
+                </ul>
+                <p><strong>Instructions:</strong> Navigate through all pages, complete the quiz, and check the debug panel below to see xAPI statements being sent!</p>
+            </div>
+
+            <!-- Page 2: Content -->
+            <div class="page" id="page2" style="display: none;">
+                <h2>Understanding xAPI</h2>
+                <p>xAPI (Experience API), also known as Tin Can API, is a modern e-learning specification that tracks learning experiences.</p>
+                <h3>Key Concepts:</h3>
+                <div class="info-box">
+                    <p><strong>Actor:</strong> Who is learning (the learner)</p>
+                    <p><strong>Verb:</strong> What action was taken (completed, passed, answered, etc.)</p>
+                    <p><strong>Object:</strong> What was acted upon (this course, a quiz, etc.)</p>
+                    <p><strong>LRS:</strong> Learning Record Store - where statements are sent</p>
+                </div>
+                <p>This wrapper handles all the xAPI complexity for you - you just call simple methods like <code>saveProgress()</code> and <code>setComplete()</code>!</p>
+            </div>
+
+            <!-- Page 3: Interactive Content -->
+            <div class="page" id="page3" style="display: none;">
+                <h2>Interactive Tracking</h2>
+                <p>xAPI can track virtually any learning interaction. Let's test a few:</p>
+                <div class="interaction-buttons">
+                    <button onclick="trackInteraction('watched-video')" class="interaction-btn">📹 Watch Video</button>
+                    <button onclick="trackInteraction('read-article')" class="interaction-btn">📄 Read Article</button>
+                    <button onclick="trackInteraction('listened-audio')" class="interaction-btn">🎧 Listen Audio</button>
+                    <button onclick="trackInteraction('downloaded-resource')" class="interaction-btn">⬇️ Download Resource</button>
+                </div>
+                <div id="interactionFeedback" class="feedback-box" style="display: none;">
+                    <p>✅ Interaction tracked! Check the debug panel to see the statement.</p>
+                </div>
+                <p class="note">Each button sends a unique xAPI statement. These can be viewed in your LRS!</p>
+            </div>
+
+            <!-- Page 4: Knowledge Check -->
+            <div class="page" id="page4" style="display: none;">
+                <h2>Knowledge Check</h2>
+                <p>Answer these questions to test your understanding of xAPI:</p>
+                
+                <div class="quiz-question">
+                    <p><strong>1. What does xAPI stand for?</strong></p>
+                    <label><input type="radio" name="q1" value="A"> A) Experience API</label>
+                    <label><input type="radio" name="q1" value="B"> B) Extended API</label>
+                    <label><input type="radio" name="q1" value="C"> C) External API</label>
+                </div>
+
+                <div class="quiz-question">
+                    <p><strong>2. What is an LRS?</strong></p>
+                    <label><input type="radio" name="q2" value="A"> A) Learning Resource System</label>
+                    <label><input type="radio" name="q2" value="B"> B) Learning Record Store</label>
+                    <label><input type="radio" name="q2" value="C"> C) Learner Registration Service</label>
+                </div>
+
+                <div class="quiz-question">
+                    <p><strong>3. What format does xAPI use for statements?</strong></p>
+                    <label><input type="radio" name="q3" value="A"> A) XML</label>
+                    <label><input type="radio" name="q3" value="B"> B) CSV</label>
+                    <label><input type="radio" name="q3" value="C"> C) JSON</label>
+                </div>
+
+                <div class="quiz-question">
+                    <p><strong>4. In an xAPI statement, what represents "who" did something?</strong></p>
+                    <label><input type="radio" name="q4" value="A"> A) Object</label>
+                    <label><input type="radio" name="q4" value="B"> B) Actor</label>
+                    <label><input type="radio" name="q4" value="C"> C) Verb</label>
+                </div>
+
+                <div class="quiz-question">
+                    <p><strong>5. Which is a valid xAPI verb?</strong></p>
+                    <label><input type="radio" name="q5" value="A"> A) clicked</label>
+                    <label><input type="radio" name="q5" value="B"> B) completed</label>
+                    <label><input type="radio" name="q5" value="C"> C) finished</label>
+                </div>
+
+                <button onclick="gradeQuiz()" class="quiz-submit-btn">Submit Quiz</button>
+                <div id="quizResults" class="quiz-results" style="display: none;"></div>
+            </div>
+
+            <!-- Page 5: Results -->
+            <div class="page" id="page5" style="display: none;">
+                <h2>🎉 Course Complete!</h2>
+                <div id="finalResults" class="results-box">
+                    <p>Calculating your results...</p>
+                </div>
+                <h3>What Happened Behind the Scenes:</h3>
+                <ul>
+                    <li>✅ xAPI statements sent for each page view</li>
+                    <li>✅ Progress saved to LRS (or localStorage in dev mode)</li>
+                    <li>✅ Quiz answers tracked as interaction statements</li>
+                    <li>✅ Final score reported to LRS</li>
+                    <li>✅ Completion statement sent</li>
+                </ul>
+                <p><strong>Next Steps:</strong></p>
+                <ul>
+                    <li>Check your LRS to see all the statements</li>
+                    <li>Close and reopen to test resume functionality</li>
+                    <li>Try integrating this wrapper into your own courses!</li>
+                </ul>
+            </div>
+        </main>
+
+        <nav>
+            <button id="prevBtn" onclick="prevPage()" disabled>← Previous</button>
+            <button id="nextBtn" onclick="nextPage()">Next →</button>
+        </nav>
+
+        <!-- Debug Panel -->
+        <div class="debug-panel">
+            <h3>🔍 Debug Panel</h3>
+            <div class="debug-info">
+                <div class="debug-row">
+                    <strong>Environment:</strong>
+                    <span id="debugEnv">Detecting...</span>
+                </div>
+                <div class="debug-row">
+                    <strong>Initialized:</strong>
+                    <span id="debugInit">No</span>
+                </div>
+                <div class="debug-row">
+                    <strong>Current Page:</strong>
+                    <span id="debugPage">1</span>
+                </div>
+                <div class="debug-row">
+                    <strong>Quiz Score:</strong>
+                    <span id="debugScore">Not taken</span>
+                </div>
+                <div class="debug-row">
+                    <strong>Completed:</strong>
+                    <span id="debugComplete">No</span>
+                </div>
+                <div class="debug-row">
+                    <strong>Statements Sent:</strong>
+                    <span id="debugStatements">0</span>
+                </div>
+            </div>
+            <div class="debug-statements">
+                <h4>Recent Statements:</h4>
+                <div id="statementsList" class="statements-list">
+                    <p class="no-statements">No statements yet...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="course.js"></script>
+</body>
+</html>
+
