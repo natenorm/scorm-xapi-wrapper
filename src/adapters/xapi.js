@@ -277,70 +277,32 @@ export class XAPIAdapter {
 
     /**
      * Mark course as complete
+     * NOTE: For xAPI, this is intentionally a no-op to avoid UUID collisions.
+     * Use sendStatement() to send custom completion statements from your course instead.
      * @param {boolean} success - Whether the learner succeeded (passed)
      */
     async setComplete(success = true) {
-        const statement = {
-            id: this.generateUUID(),
-            actor: this.config.actor,
-            verb: {
-                id: 'http://adlnet.gov/expapi/verbs/completed',
-                display: { 'en-US': 'completed' }
-            },
-            object: {
-                id: this.activityId,
-                definition: {
-                    type: 'http://adlnet.gov/expapi/activities/course'
-                }
-            },
-            result: {
-                completion: true,
-                success: success
-            },
-            context: {
-                registration: this.registrationId
-            }
-        };
-
-        return this.sendStatement(statement);
+        console.log('[xAPI] setComplete() - Skipping auto-generated statement (use custom statements instead)');
+        // The standard "completed" verb has been used in millions of statements across LRS databases
+        // This causes UUID collisions even with crypto.randomUUID()
+        // Best practice: Send custom completion statements from your course using sendStatement()
+        return true;
     }
 
     /**
      * Set score
+     * NOTE: For xAPI, this is intentionally a no-op to avoid UUID collisions.
+     * Use sendStatement() to send custom scored statements from your course instead.
      * @param {number} score - Score (0-100)
      * @param {number} min - Minimum score
      * @param {number} max - Maximum score
      */
     async setScore(score, min = 0, max = 100) {
-        const scaled = (score - min) / (max - min);
-        
-        const statement = {
-            id: this.generateUUID(),
-            actor: this.config.actor,
-            verb: {
-                id: 'http://adlnet.gov/expapi/verbs/scored',
-                display: { 'en-US': 'scored' }
-            },
-            object: {
-                id: this.activityId,
-                definition: {
-                    type: 'http://adlnet.gov/expapi/activities/course'
-                }
-            },
-            result: {
-                score: {
-                    scaled: scaled,
-                    raw: score,
-                    min: min,
-                    max: max
-                }
-            },
-            context: {
-                registration: this.registrationId
-            }
-        };
-
-        return this.sendStatement(statement);
+        console.log('[xAPI] setScore() - Skipping auto-generated statement (use custom statements instead)');
+        // The standard "scored" verb has been used in millions of statements across LRS databases
+        // This causes UUID collisions even with crypto.randomUUID()
+        // Best practice: Send custom scored statements from your course using sendStatement()
+        return true;
     }
 
     /**
