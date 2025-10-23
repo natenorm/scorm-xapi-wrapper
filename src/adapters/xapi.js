@@ -94,8 +94,9 @@ export class XAPIAdapter {
     /**
      * Send an xAPI statement to the LRS
      * @param {Object} statement - xAPI statement object
+     * @param {number} retryCount - Internal retry counter
      */
-    async sendStatement(statement) {
+    async sendStatement(statement, retryCount = 0) {
         if (!this.initialized) {
             throw new Error('xAPI adapter not initialized');
         }
@@ -128,13 +129,34 @@ export class XAPIAdapter {
 
                 if (!response.ok) {
                     const errorBody = await response.text();
+                    
+                    // Check for UUID collision (403 with "existing registration" message)
+                    if (response.status === 403 && errorBody.includes('existing registration')) {
+                        console.warn(`[xAPI] ⚠️ UUID collision detected! Retrying with new UUID (attempt ${retryCount + 1}/5)`);
+                        
+                        // Retry up to 5 times with new UUIDs
+                        if (retryCount < 5) {
+                            const oldId = statement.id;
+                            statement.id = this.generateUUID(); // Generate fresh UUID
+                            console.log(`[xAPI] Replaced ${oldId} with ${statement.id}`);
+                            return this.sendStatement(statement, retryCount + 1);
+                        } else {
+                            console.error('[xAPI] ❌ Max retries reached - UUID collision could not be resolved');
+                            throw new Error(`UUID collision after ${retryCount} retries: ${errorBody}`);
+                        }
+                    }
+                    
                     console.error('[xAPI] Statement error response:', errorBody);
                     throw new Error(`LRS returned ${response.status}: ${errorBody}`);
                 }
 
                 // Log successful response details
                 const responseText = await response.text();
-                console.log('[xAPI] Statement sent successfully - Response:', response.status, responseText || '(empty body)');
+                if (retryCount > 0) {
+                    console.log(`[xAPI] ✅ Statement sent successfully after ${retryCount} ${retryCount === 1 ? 'retry' : 'retries'}!`);
+                } else {
+                    console.log('[xAPI] Statement sent successfully - Response:', response.status, responseText || '(empty body)');
+                }
                 console.log('[xAPI] Statement ID:', statement.id);
                 return true;
             } catch (error) {
