@@ -277,32 +277,86 @@ export class XAPIAdapter {
 
     /**
      * Mark course as complete
-     * NOTE: For xAPI, this is intentionally a no-op to avoid UUID collisions.
-     * Use sendStatement() to send custom completion statements from your course instead.
      * @param {boolean} success - Whether the learner succeeded (passed)
      */
     async setComplete(success = true) {
-        console.log('[xAPI] setComplete() - Skipping auto-generated statement (use custom statements instead)');
-        // The standard "completed" verb has been used in millions of statements across LRS databases
-        // This causes UUID collisions even with crypto.randomUUID()
-        // Best practice: Send custom completion statements from your course using sendStatement()
-        return true;
+        const statement = {
+            id: this.generateUUID(),
+            actor: this.config.actor,
+            verb: {
+                id: 'http://adlnet.gov/expapi/verbs/completed',
+                display: { 'en-US': 'completed' }
+            },
+            object: {
+                // Use unique object ID to avoid collisions with old registrations
+                id: `${this.activityId}/completion`,
+                definition: {
+                    name: { 'en-US': 'Course Completion' },
+                    type: 'http://adlnet.gov/expapi/activities/assessment'
+                }
+            },
+            result: {
+                completion: true,
+                success: success
+            },
+            context: {
+                registration: this.registrationId,
+                contextActivities: {
+                    parent: [{
+                        id: this.activityId,
+                        objectType: 'Activity'
+                    }]
+                }
+            }
+        };
+
+        return this.sendStatement(statement);
     }
 
     /**
      * Set score
-     * NOTE: For xAPI, this is intentionally a no-op to avoid UUID collisions.
-     * Use sendStatement() to send custom scored statements from your course instead.
      * @param {number} score - Score (0-100)
      * @param {number} min - Minimum score
      * @param {number} max - Maximum score
      */
     async setScore(score, min = 0, max = 100) {
-        console.log('[xAPI] setScore() - Skipping auto-generated statement (use custom statements instead)');
-        // The standard "scored" verb has been used in millions of statements across LRS databases
-        // This causes UUID collisions even with crypto.randomUUID()
-        // Best practice: Send custom scored statements from your course using sendStatement()
-        return true;
+        const scaled = (score - min) / (max - min);
+        
+        const statement = {
+            id: this.generateUUID(),
+            actor: this.config.actor,
+            verb: {
+                id: 'http://adlnet.gov/expapi/verbs/scored',
+                display: { 'en-US': 'scored' }
+            },
+            object: {
+                // Use unique object ID to avoid collisions with old registrations
+                id: `${this.activityId}/score`,
+                definition: {
+                    name: { 'en-US': 'Course Score' },
+                    type: 'http://adlnet.gov/expapi/activities/assessment'
+                }
+            },
+            result: {
+                score: {
+                    scaled: scaled,
+                    raw: score,
+                    min: min,
+                    max: max
+                }
+            },
+            context: {
+                registration: this.registrationId,
+                contextActivities: {
+                    parent: [{
+                        id: this.activityId,
+                        objectType: 'Activity'
+                    }]
+                }
+            }
+        };
+
+        return this.sendStatement(statement);
     }
 
     /**
@@ -322,13 +376,21 @@ export class XAPIAdapter {
                 display: { 'en-US': 'terminated' }
             },
             object: {
-                id: this.activityId,
+                // Use unique object ID to avoid collisions with old registrations
+                id: `${this.activityId}/session`,
                 definition: {
+                    name: { 'en-US': 'Course Session' },
                     type: 'http://adlnet.gov/expapi/activities/course'
                 }
             },
             context: {
-                registration: this.registrationId
+                registration: this.registrationId,
+                contextActivities: {
+                    parent: [{
+                        id: this.activityId,
+                        objectType: 'Activity'
+                    }]
+                }
             }
         };
 
