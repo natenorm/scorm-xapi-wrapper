@@ -259,7 +259,7 @@ export class XAPIAdapter {
      */
     async setComplete(success = true) {
         const statement = {
-            id: this.generateDeterministicUUID('completed'),
+            id: this.generateUUID(),
             actor: this.config.actor,
             verb: {
                 id: 'http://adlnet.gov/expapi/verbs/completed',
@@ -293,7 +293,7 @@ export class XAPIAdapter {
         const scaled = (score - min) / (max - min);
         
         const statement = {
-            id: this.generateDeterministicUUID('scored'),
+            id: this.generateUUID(),
             actor: this.config.actor,
             verb: {
                 id: 'http://adlnet.gov/expapi/verbs/scored',
@@ -331,7 +331,7 @@ export class XAPIAdapter {
 
         // Send termination statement
         const statement = {
-            id: this.generateDeterministicUUID('terminated'),
+            id: this.generateUUID(),
             actor: this.config.actor,
             verb: {
                 id: 'http://adlnet.gov/expapi/verbs/terminated',
