@@ -258,6 +258,7 @@ export class XAPIAdapter {
      */
     async setComplete() {
         const statement = {
+            id: this.generateDeterministicUUID('completed'),
             actor: this.config.actor,
             verb: {
                 id: 'http://adlnet.gov/expapi/verbs/completed',
@@ -287,6 +288,7 @@ export class XAPIAdapter {
         const scaled = (score - min) / (max - min);
         
         const statement = {
+            id: this.generateDeterministicUUID('scored'),
             actor: this.config.actor,
             verb: {
                 id: 'http://adlnet.gov/expapi/verbs/scored',
@@ -324,6 +326,7 @@ export class XAPIAdapter {
 
         // Send termination statement
         const statement = {
+            id: this.generateDeterministicUUID('terminated'),
             actor: this.config.actor,
             verb: {
                 id: 'http://adlnet.gov/expapi/verbs/terminated',
@@ -400,6 +403,28 @@ export class XAPIAdapter {
             const v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
+    }
+
+    /**
+     * Helper: Generate deterministic UUID for wrapper statements
+     * Uses registration + statement type + timestamp to avoid collisions
+     */
+    generateDeterministicUUID(statementType) {
+        const input = `${this.registrationId}-${statementType}-${Date.now()}`;
+        
+        // Simple hash function
+        let hash = 0;
+        for (let i = 0; i < input.length; i++) {
+            hash = ((hash << 5) - hash) + input.charCodeAt(i);
+            hash = hash | 0; // Convert to 32bit integer
+        }
+        
+        // Convert hash to UUID format
+        const hex = Math.abs(hash).toString(16).padStart(8, '0');
+        const timestamp = Date.now().toString(16).padStart(12, '0');
+        const random = Math.random().toString(16).slice(2, 6);
+        
+        return `${hex.slice(0, 8)}-${timestamp.slice(0, 4)}-4${timestamp.slice(4, 7)}-a${random}-${timestamp.slice(7, 19)}`;
     }
 
     /**
