@@ -1,4 +1,4 @@
-import ScormWrapper from './scorm-wrapper.esm.js';
+import { ScormWrapper } from './scorm-wrapper.esm.js';
 
 // Course state
 const courseData = {
@@ -22,21 +22,46 @@ function generateUUID() {
     });
 }
 
-// xAPI configuration (these would typically come from your LMS/LRS via URL parameters)
-// For local development, we'll set up a global config
-// In production, this would come from LRS launch parameters
+// xAPI configuration - will be set from URL parameters (SCORM Cloud, etc.) or defaults for local dev
+// Check URL parameters first (standard xAPI launch)
+const urlParams = new URLSearchParams(window.location.search);
+const endpoint = urlParams.get('endpoint');
+const auth = urlParams.get('auth');
+const actorParam = urlParams.get('actor');
+const activityId = urlParams.get('activity_id') || 'http://example.com/activities/xapi-test-course';
+const registration = urlParams.get('registration') || generateUUID();
+
+// Parse actor if provided
+let actor;
+if (actorParam) {
+    try {
+        actor = JSON.parse(decodeURIComponent(actorParam));
+    } catch (e) {
+        console.warn('[Course] Failed to parse actor from URL params, using default');
+        actor = { name: 'Test User', mbox: 'mailto:test@example.com' };
+    }
+} else {
+    actor = { name: 'Test User', mbox: 'mailto:test@example.com' };
+}
+
+// Set up xAPI config (URL params override defaults)
 window.xAPIConfig = {
-    // endpoint: 'https://your-lrs.com/data/xAPI', // Uncomment for real LRS
-    // auth: 'Basic your-base64-credentials',      // Uncomment for real LRS
-    actor: {
-        name: 'Test User',
-        mbox: 'mailto:test@example.com'
-    },
-    activityId: 'http://example.com/activities/xapi-test-course',
-    registration: generateUUID()
+    endpoint: endpoint || undefined,  // Will be undefined for local dev
+    auth: auth || undefined,          // Will be undefined for local dev
+    actor: actor,
+    activityId: activityId,
+    registration: registration
 };
 
-const wrapper = new ScormWrapper();
+console.log('[Course] xAPI Config:', {
+    hasEndpoint: !!window.xAPIConfig.endpoint,
+    hasAuth: !!window.xAPIConfig.auth,
+    actor: window.xAPIConfig.actor,
+    activityId: window.xAPIConfig.activityId
+});
+
+// Use the singleton instance (not a constructor!)
+const wrapper = ScormWrapper;
 let envType = 'local'; // Default to local
 
 // Initialize course

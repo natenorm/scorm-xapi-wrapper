@@ -28,7 +28,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const endpoint = urlParams.get('endpoint');
 const auth = urlParams.get('auth');
 const actorParam = urlParams.get('actor');
-const activityId = urlParams.get('activity_id') || 'http://example.com/activities/xapi-test-course';
+const activityId = urlParams.get('activity_id') || 'http://example.com/xapi-test-course';
 const registration = urlParams.get('registration') || generateUUID();
 
 // Parse actor if provided

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tincan xmlns="http://projecttincan.com/tincan.xsd">
+    <activities>
+        <activity id="http://example.com/activities/xapi-test-course" type="http://adlnet.gov/expapi/activities/course">
+            <name>xAPI Test Course</name>
+            <description lang="en-US">Comprehensive xAPI test course demonstrating statement tracking, progress persistence, and LRS integration</description>
+            <launch lang="en-US">index.html</launch>
+        </activity>
+    </activities>
+</tincan>
+
