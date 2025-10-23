@@ -113,7 +113,9 @@ export class XAPIAdapter {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`LRS returned ${response.status}: ${response.statusText}`);
+                    const errorBody = await response.text();
+                    console.error('[xAPI] Statement error response:', errorBody);
+                    throw new Error(`LRS returned ${response.status}: ${errorBody}`);
                 }
 
                 console.log('[xAPI] Statement sent successfully');
@@ -162,7 +164,9 @@ export class XAPIAdapter {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`LRS returned ${response.status}: ${response.statusText}`);
+                    const errorBody = await response.text();
+                    console.error('[xAPI] Save state error response:', errorBody);
+                    throw new Error(`LRS returned ${response.status}: ${errorBody}`);
                 }
 
                 console.log('[xAPI] State saved to LRS');
@@ -213,7 +217,9 @@ export class XAPIAdapter {
                 }
 
                 if (!response.ok) {
-                    throw new Error(`LRS returned ${response.status}: ${response.statusText}`);
+                    const errorBody = await response.text();
+                    console.error('[xAPI] Load state error response:', errorBody);
+                    throw new Error(`LRS returned ${response.status}: ${errorBody}`);
                 }
 
                 const data = await response.json();
