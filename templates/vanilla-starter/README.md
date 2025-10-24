@@ -30,15 +30,36 @@ npm run build
 
 This creates a `dist/` folder with all course files ready for deployment.
 
-### Creating SCORM Package
+### Packaging Your Course
 
-Create a SCORM-compliant ZIP package:
+This template works with both SCORM 2004 and xAPI formats. Choose the packaging format based on your target platform:
+
+#### SCORM 2004 Package (Most Common)
+
+For traditional LMS platforms (Moodle, Canvas, Blackboard):
 
 ```bash
-npm run package
+npm run package:scorm
 ```
 
-This generates `course.zip` that can be uploaded to any SCORM-compliant LMS (Moodle, Canvas, Blackboard, etc.).
+Creates `course.zip` with SCORM 2004 4th Edition manifest.
+
+#### xAPI Package
+
+For modern Learning Record Stores (SCORM Cloud xAPI mode, Learning Locker):
+
+```bash
+npm run package:xapi
+```
+
+Creates `course-xapi.zip` with xAPI (Tin Can) manifest.
+
+#### Which Should I Use?
+
+- **SCORM 2004**: Most LMS platforms (Moodle, Canvas, Blackboard, Cornerstone)
+- **xAPI**: Modern LRS platforms, SCORM Cloud xAPI mode, advanced analytics needs
+
+**Note:** The same course code works for both! The wrapper auto-detects the environment at runtime.
 
 ## Customization
 

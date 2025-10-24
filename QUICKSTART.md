@@ -38,19 +38,54 @@ The wrapper automatically uses **local storage mode** when not in an LMS, so you
 - Tell Cursor what you want (see [CURSOR_AI_GUIDE.md](./CURSOR_AI_GUIDE.md))
 - Let AI build it for you!
 
-### 4. Package for LMS
+### 4. Package for Your Platform
 
+Choose based on your target platform:
+
+**For SCORM 2004 LMS** (Moodle, Canvas, Blackboard):
 ```bash
-npm run package
+npm run package:scorm
 ```
+Creates `course.zip`
 
-Creates `course.zip` - ready to upload to any SCORM 2004 compliant LMS!
+**For xAPI LRS** (SCORM Cloud xAPI, Learning Locker):
+```bash
+npm run package:xapi
+```
+Creates `course-xapi.zip`
+
+**Not sure which to use?** Choose SCORM - it's supported by 95% of LMS platforms!
 
 ### 5. Upload & Test
 
+**SCORM Package:**
 - Upload `course.zip` to your LMS (Moodle, Canvas, Blackboard, etc.)
-- Or test in [SCORM Cloud](https://cloud.scorm.com/) (free account)
-- Launch and verify it works!
+
+**xAPI Package:**
+- Upload `course-xapi.zip` to your LRS (SCORM Cloud, Learning Locker, etc.)
+
+**Free Testing:** Use [SCORM Cloud](https://cloud.scorm.com/) to test both SCORM and xAPI packages!
+
+## SCORM vs xAPI - Which Should I Use?
+
+**Quick Answer:** Use SCORM unless you specifically need xAPI features.
+
+### SCORM 2004
+✅ **Use if you have:**
+- Traditional LMS (Moodle, Canvas, Blackboard, Cornerstone)
+- Corporate training platform
+- School/university learning system
+- Most common scenario (95% of cases)
+
+### xAPI
+✅ **Use if you need:**
+- Advanced analytics and reporting
+- Cross-platform tracking (mobile + desktop + offline)
+- Learning Record Store (LRS) instead of LMS
+- SCORM Cloud in xAPI mode
+- Modern learning analytics
+
+**Good News:** Your code works for both! Just choose the packaging format when you're ready to deploy.
 
 ## Using the SCORM Wrapper
 

@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "npm run build && npx http-server dist -p 8080 -o",
     "build": "node build.js",
-    "package": "npm run build && npx package-scorm -i dist -o course.zip --title 'My SCORM Course'"
+    "package": "npm run package:scorm",
+    "package:scorm": "npm run build && npx package-scorm -i dist -o course.zip --title 'My SCORM Course'",
+    "package:xapi": "npm run build && npx package-xapi -i dist -o course-xapi.zip --title 'My xAPI Course'"
   },
   "dependencies": {
     "scorm-xapi-wrapper": "^1.0.0"

@@ -7,10 +7,16 @@ src/
 rollup.config.js
 setup-*.sh
 
-# Documentation (keep only essential)
+# Test courses (development only)
+test-courses/
+
+# Internal documentation (keep only user-facing docs)
+COMPREHENSIVE_AUDIT.md
+IMPLEMENTATION_STATUS.md
+TEST_COURSE_READY.md
 QUICK_REFERENCE.md
 
-# Keep these
+# Keep these essential files
 !README.md
 !QUICKSTART.md
 !CURSOR_AI_GUIDE.md

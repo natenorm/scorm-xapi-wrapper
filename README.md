@@ -1,5 +1,8 @@
 # SCORM/xAPI Wrapper
 
+[![npm version](https://img.shields.io/npm/v/scorm-xapi-wrapper.svg)](https://www.npmjs.com/package/scorm-xapi-wrapper)
+[![license](https://img.shields.io/npm/l/scorm-xapi-wrapper.svg)](https://github.com/natenorm/scorm-xapi-wrapper/blob/main/LICENSE)
+
 A framework-agnostic JavaScript library for building SCORM 2004 and xAPI-compliant e-learning content. Create custom courses with any web technology and easily integrate LMS tracking for progress, completion, and scoring.
 
 ## Features
@@ -15,36 +18,7 @@ A framework-agnostic JavaScript library for building SCORM 2004 and xAPI-complia
 
 ## Quick Start
 
-### Local Development (Current Setup)
-
-This package works locally without publishing to npm!
-
-**Option 1: Copy a Template**
-```bash
-# From the SCORM Wrapper directory:
-cp -r templates/vanilla-starter ~/my-new-course
-cd ~/my-new-course
-npm install
-npm run dev          # Start development server
-npm run package      # Create SCORM ZIP for LMS
-```
-
-**Option 2: Use npm link (Recommended)**
-```bash
-# In the SCORM Wrapper directory:
-npm run build        # Build the wrapper
-npm link             # Create global symlink
-
-# In your new course directory:
-npm init -y
-npm link scorm-xapi-wrapper  # Link to local wrapper
-# Then use the wrapper as normal in your code
-```
-
-**Option 3: Direct File Reference**
-Templates use `"scorm-xapi-wrapper": "file:../.."` to reference the local build. You can copy this approach.
-
-### After Publishing to npm
+Create a new course in seconds:
 
 ```bash
 npx create-scorm-course my-course
@@ -52,6 +26,23 @@ cd my-course
 npm install
 npm run dev
 ```
+
+Choose your template:
+- **Vanilla** - Plain HTML/CSS/JavaScript (simplest)
+- **React** - React 18 + Vite
+- **Vue** - Vue 3 + Vite
+
+### Package for Your LMS
+
+```bash
+# For SCORM 2004 (most common)
+npm run package:scorm
+
+# For xAPI/Tin Can
+npm run package:xapi
+```
+
+Upload the generated ZIP file to your LMS or Learning Record Store!
 
 ## Usage
 
@@ -254,33 +245,57 @@ if (ScormWrapper.isInitialized()) {
 }
 ```
 
+## SCORM vs xAPI: One Codebase, Two Formats
+
+**Write your course once, package it for any platform!**
+
+The wrapper automatically detects whether it's running in a SCORM or xAPI environment. You don't need to change your code - just choose the packaging format based on where you'll deploy:
+
+### When to Use Each Format
+
+**SCORM 2004** (Most Common)
+- Traditional LMS platforms: Moodle, Canvas, Blackboard, Cornerstone
+- Enterprise learning systems
+- Most corporate training environments
+- **Command:** `npm run package:scorm`
+
+**xAPI / Tin Can**
+- Modern Learning Record Stores (LRS)
+- SCORM Cloud in xAPI mode
+- Advanced learning analytics
+- Cross-platform tracking (mobile, desktop, offline)
+- **Command:** `npm run package:xapi`
+
+### How It Works
+
+1. **Develop** - Write your course using the wrapper API
+2. **Test Locally** - Auto-detects localStorage mode for development
+3. **Package** - Choose SCORM or xAPI based on target platform
+4. **Deploy** - Upload to your LMS/LRS
+
+The same JavaScript code works everywhere!
+
 ## Packaging for LMS
 
-### CLI Tool
-
-Package your course for upload to an LMS:
+### SCORM 2004 Package
 
 ```bash
 npx package-scorm -i ./dist -o course.zip --title "My Course"
 ```
 
-Options:
+### xAPI Package
+
+```bash
+npx package-xapi -i ./dist -o course-xapi.zip --title "My Course"
+```
+
+### Options (Both Commands)
+
 - `-i, --input <directory>` - Input directory containing course files (required)
-- `-o, --output <file>` - Output ZIP file path (default: course.zip)
+- `-o, --output <file>` - Output ZIP file path
 - `-t, --title <title>` - Course title (default: Course)
 - `-d, --description <description>` - Course description
-- `--id, --identifier <id>` - Course identifier (auto-generated if not provided)
-
-### In package.json
-
-```json
-{
-  "scripts": {
-    "build": "vite build",
-    "package": "npm run build && package-scorm -i dist -o course.zip"
-  }
-}
-```
+- `--id, --identifier <id>` - Course/activity identifier (auto-generated if not provided)
 
 ## Templates
 
@@ -388,7 +403,7 @@ MIT
 
 ## Support
 
-For issues and questions, please [open an issue](https://github.com/yourusername/scorm-xapi-wrapper/issues).
+For issues and questions, please [open an issue](https://github.com/natenorm/scorm-xapi-wrapper/issues).
 
 ---
 

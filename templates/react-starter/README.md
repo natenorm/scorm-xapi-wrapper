@@ -28,15 +28,31 @@ Build the course for production:
 npm run build
 ```
 
-### Creating SCORM Package
+### Packaging Your Course
 
-Create a SCORM-compliant ZIP package:
+This template works with both SCORM 2004 and xAPI formats. Choose based on your target platform:
+
+#### SCORM 2004 Package (Most Common)
 
 ```bash
-npm run package
+npm run package:scorm
 ```
 
-Upload `course.zip` to your LMS.
+Creates `course.zip` for traditional LMS platforms (Moodle, Canvas, Blackboard).
+
+#### xAPI Package
+
+```bash
+npm run package:xapi
+```
+
+Creates `course-xapi.zip` for Learning Record Stores (SCORM Cloud xAPI, Learning Locker).
+
+#### Quick Reference
+- **SCORM 2004**: Use for most LMS platforms
+- **xAPI**: Use for modern LRS platforms or advanced analytics
+
+The wrapper automatically detects the environment at runtime - no code changes needed!
 
 ## Project Structure
 

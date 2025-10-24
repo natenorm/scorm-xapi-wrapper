@@ -8,11 +8,13 @@ Use Cursor AI to build professional e-learning courses in minutes instead of hou
 1. npx create-scorm-course my-course
 2. Open in Cursor
 3. Tell Cursor what to build
-4. npm run package
+4. npm run package:scorm (or package:xapi)
 5. Upload to LMS
 ```
 
 That's it! Let AI do the heavy lifting while you focus on content.
+
+**Pro Tip:** Your course works with both SCORM and xAPI automatically. Just choose the packaging format when you deploy!
 
 ## Getting Started
 
@@ -225,6 +227,49 @@ Ask Cursor to check:
 - Ensure navigation works on touch devices"
 ```
 
+## Packaging Your Course
+
+Once your course is working locally, tell Cursor to prepare it for deployment:
+
+### For SCORM 2004 (Most Common)
+
+```
+"Package this course for SCORM 2004. Run npm run package:scorm to create the ZIP file."
+```
+
+Or just run manually:
+```bash
+npm run package:scorm
+```
+
+### For xAPI / Tin Can
+
+```
+"Package this course for xAPI format. Run npm run package:xapi to create the ZIP file."
+```
+
+Or just run manually:
+```bash
+npm run package:xapi
+```
+
+### Cursor Packaging Prompts
+
+**Prepare for specific platform:**
+```
+"Prepare this course for upload to Moodle. Make sure it's packaged as SCORM 2004."
+```
+
+**Test packaging:**
+```
+"Package this course for SCORM Cloud's xAPI mode and tell me what files were included."
+```
+
+**Customize manifest:**
+```
+"Update the course title and description in the packaging command to 'Fire Safety Training - Interactive Module'."
+```
+
 ## Testing Your Course
 
 ### Local Testing
@@ -237,16 +282,19 @@ Cursor can help set up test buttons:
 
 ```
 "Add a debug panel at the bottom showing:
-- Current environment
+- Current environment (SCORM/xAPI/local)
 - Saved progress data
 - Current score
 - Completion status
 - Include buttons to reset data and test resume"
 ```
 
-### SCORM Cloud Testing
+### LMS Testing
 
-After packaging (`npm run package`), upload to [SCORM Cloud](https://cloud.scorm.com/).
+After packaging, upload to your LMS or [SCORM Cloud](https://cloud.scorm.com/) (free):
+
+**SCORM:** Upload `course.zip` to test SCORM 2004 compatibility  
+**xAPI:** Upload `course-xapi.zip` to test in xAPI mode
 
 If issues occur, ask Cursor:
 
@@ -254,6 +302,13 @@ If issues occur, ask Cursor:
 "The course isn't detecting the SCORM API in SCORM Cloud. 
 Review the wrapper initialization and add more detailed logging 
 to help diagnose the issue."
+```
+
+### Platform-Specific Testing
+
+```
+"I'm testing in Moodle and the course isn't resuming properly. 
+Help me debug the saveProgress and getProgress calls."
 ```
 
 ## Pro Tips
