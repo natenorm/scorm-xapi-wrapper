@@ -80,14 +80,11 @@ export class XAPIAdapter {
 
         // Check if we have a real LRS endpoint
         if (this.config.endpoint && this.config.auth) {
-            console.log('[xAPI] Initializing with LRS:', this.config.endpoint);
-            console.log('[xAPI] Registration ID:', this.registrationId);
-            console.log('[xAPI] Activity ID:', this.activityId);
-            console.log('[xAPI] Actor:', this.config.actor);
+            console.log('[xAPI] Initialized with LRS');
             this.initialized = true;
             return true;
         } else {
-            console.log('[xAPI] Initializing in local mode (no LRS configured)');
+            console.log('[xAPI] Initialized in local mode');
             this.initialized = true;
             return true;
         }
@@ -114,10 +111,6 @@ export class XAPIAdapter {
             statement.actor = this.config.actor;
         }
 
-        console.log('[xAPI] Statement:', statement);
-        console.log('[xAPI] Statement registration:', statement.context?.registration);
-        console.log('[xAPI] Wrapper registrationId:', this.registrationId);
-
         // If we have a real LRS, send the statement
         if (this.config.endpoint && this.config.auth) {
             try {
@@ -136,40 +129,25 @@ export class XAPIAdapter {
                     
                     // Check for UUID collision (403 with "existing registration" message)
                     if (response.status === 403 && errorBody.includes('existing registration')) {
-                        console.warn(`[xAPI] ⚠️ UUID collision detected! Retrying with new UUID (attempt ${retryCount + 1}/5)`);
-                        
                         // Retry up to 5 times with new UUIDs
                         if (retryCount < 5) {
-                            const oldId = statement.id;
-                            statement.id = this.generateUUID(); // Generate fresh UUID
-                            console.log(`[xAPI] Replaced ${oldId} with ${statement.id}`);
+                            statement.id = this.generateUUID();
                             return this.sendStatement(statement, retryCount + 1);
                         } else {
-                            console.error('[xAPI] ❌ Max retries reached - UUID collision could not be resolved');
                             throw new Error(`UUID collision after ${retryCount} retries: ${errorBody}`);
                         }
                     }
                     
-                    console.error('[xAPI] Statement error response:', errorBody);
                     throw new Error(`LRS returned ${response.status}: ${errorBody}`);
                 }
 
-                // Log successful response details
-                const responseText = await response.text();
-                if (retryCount > 0) {
-                    console.log(`[xAPI] ✅ Statement sent successfully after ${retryCount} ${retryCount === 1 ? 'retry' : 'retries'}!`);
-                } else {
-                    console.log('[xAPI] Statement sent successfully - Response:', response.status, responseText || '(empty body)');
-                }
-                console.log('[xAPI] Statement ID:', statement.id);
                 return true;
             } catch (error) {
                 console.error('[xAPI] Failed to send statement:', error);
                 return false;
             }
         } else {
-            // Local mode - just log it
-            console.log('[xAPI] Local mode - statement logged (not sent to LRS)');
+            // Local mode - no LRS to send to
             return true;
         }
     }
@@ -266,7 +244,7 @@ export class XAPIAdapter {
                 }
 
                 const data = await response.json();
-                console.log('[xAPI] State loaded from LRS:', data);
+                console.log('[xAPI] State loaded from LRS');
                 return data;
             } catch (error) {
                 console.error('[xAPI] Failed to load state:', error);
@@ -398,9 +376,7 @@ export class XAPIAdapter {
             const key = `xapi_progress_${this.activityId}`;
             const data = localStorage.getItem(key);
             if (data) {
-                const parsed = JSON.parse(data);
-                console.log('[xAPI] State loaded from localStorage:', parsed);
-                return parsed;
+            return JSON.parse(data);
             }
             return {};
         } catch (error) {
@@ -415,13 +391,10 @@ export class XAPIAdapter {
     generateUUID() {
         // Use crypto.randomUUID if available (modern browsers)
         if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-            const uuid = crypto.randomUUID();
-            console.log('[xAPI] Generated UUID using crypto.randomUUID():', uuid);
-            return uuid;
+            return crypto.randomUUID();
         }
         
-        // Fallback: UUID v4 with timestamp for extra entropy
-        console.warn('[xAPI] crypto.randomUUID() not available, using fallback');
+        // Fallback: UUID v4 generation
         const timestamp = Date.now().toString(16);
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c, i) {
             // Mix in timestamp for first 8 chars

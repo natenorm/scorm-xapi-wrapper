@@ -148,6 +148,28 @@ export default {
 </script>
 ```
 
+## xAPI Support
+
+The wrapper fully supports xAPI (Tin Can API) for modern learning record stores. When launched from an LRS, the wrapper automatically:
+- Detects xAPI configuration from URL parameters
+- Uses the State API for progress persistence  
+- Sends properly formatted xAPI statements
+- Reports completion, success, and scores
+
+### Custom xAPI Statements
+
+You can send custom xAPI statements alongside the wrapper's automatic tracking:
+
+```javascript
+await ScormWrapper.sendStatement({
+  verb: { id: 'http://adlnet.gov/expapi/verbs/experienced' },
+  object: {
+    id: 'http://example.com/my-activity',
+    definition: { name: { 'en-US': 'Page 2' } }
+  }
+});
+```
+
 ## API Reference
 
 ### ScormWrapper
@@ -189,6 +211,23 @@ Set the course score (0-100).
 
 ```javascript
 await ScormWrapper.setScore(85);
+```
+
+#### `sendStatement(statement)` (xAPI only)
+Send a custom xAPI statement. Only works when running in xAPI mode.
+
+```javascript
+await ScormWrapper.sendStatement({
+  verb: { 
+    id: 'http://adlnet.gov/expapi/verbs/answered',
+    display: { 'en-US': 'answered' }
+  },
+  object: {
+    id: 'http://example.com/questions/q1',
+    definition: { name: { 'en-US': 'Question 1' } }
+  },
+  result: { response: 'A', success: true }
+});
 ```
 
 #### `terminate()`
