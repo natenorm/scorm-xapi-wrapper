@@ -103,13 +103,15 @@ export class EnvironmentDetector {
     const auth = urlParams.get('auth');
     const actor = urlParams.get('actor');
     const activityId = urlParams.get('activity_id');
+    const registration = urlParams.get('registration');
 
     if (endpoint) {
       return {
         endpoint,
         auth,
         actor: actor ? JSON.parse(decodeURIComponent(actor)) : null,
-        activityId
+        activityId,
+        registration
       };
     }
 

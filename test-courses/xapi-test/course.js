@@ -360,7 +360,8 @@ async function sendStatement(verb, objectName, context = {}) {
             display: { 'en-US': verb }
         },
         object: {
-            id: `${window.xAPIConfig.activityId}/${objectName.replace(/\s+/g, '-').toLowerCase()}`,
+            id: window.xAPIConfig.activityId,
+            objectType: 'Activity',
             definition: {
                 name: { 'en-US': objectName },
                 type: 'http://adlnet.gov/expapi/activities/interaction'

@@ -81,6 +81,8 @@ export class XAPIAdapter {
         // Check if we have a real LRS endpoint
         if (this.config.endpoint && this.config.auth) {
             console.log('[xAPI] Initializing with LRS:', this.config.endpoint);
+            console.log('[xAPI] Registration ID:', this.registrationId);
+            console.log('[xAPI] Activity ID:', this.activityId);
             console.log('[xAPI] Actor:', this.config.actor);
             this.initialized = true;
             return true;
@@ -113,6 +115,8 @@ export class XAPIAdapter {
         }
 
         console.log('[xAPI] Statement:', statement);
+        console.log('[xAPI] Statement registration:', statement.context?.registration);
+        console.log('[xAPI] Wrapper registrationId:', this.registrationId);
 
         // If we have a real LRS, send the statement
         if (this.config.endpoint && this.config.auth) {
@@ -288,25 +292,15 @@ export class XAPIAdapter {
                 display: { 'en-US': 'completed' }
             },
             object: {
-                // Use unique object ID to avoid collisions with old registrations
-                id: `${this.activityId}/completion`,
-                definition: {
-                    name: { 'en-US': 'Course Completion' },
-                    type: 'http://adlnet.gov/expapi/activities/assessment'
-                }
+                id: this.activityId,
+                objectType: 'Activity'
             },
             result: {
                 completion: true,
                 success: success
             },
             context: {
-                registration: this.registrationId,
-                contextActivities: {
-                    parent: [{
-                        id: this.activityId,
-                        objectType: 'Activity'
-                    }]
-                }
+                registration: this.registrationId
             }
         };
 
@@ -330,12 +324,8 @@ export class XAPIAdapter {
                 display: { 'en-US': 'scored' }
             },
             object: {
-                // Use unique object ID to avoid collisions with old registrations
-                id: `${this.activityId}/score`,
-                definition: {
-                    name: { 'en-US': 'Course Score' },
-                    type: 'http://adlnet.gov/expapi/activities/assessment'
-                }
+                id: this.activityId,
+                objectType: 'Activity'
             },
             result: {
                 score: {
@@ -346,13 +336,7 @@ export class XAPIAdapter {
                 }
             },
             context: {
-                registration: this.registrationId,
-                contextActivities: {
-                    parent: [{
-                        id: this.activityId,
-                        objectType: 'Activity'
-                    }]
-                }
+                registration: this.registrationId
             }
         };
 
@@ -376,21 +360,11 @@ export class XAPIAdapter {
                 display: { 'en-US': 'terminated' }
             },
             object: {
-                // Use unique object ID to avoid collisions with old registrations
-                id: `${this.activityId}/session`,
-                definition: {
-                    name: { 'en-US': 'Course Session' },
-                    type: 'http://adlnet.gov/expapi/activities/course'
-                }
+                id: this.activityId,
+                objectType: 'Activity'
             },
             context: {
-                registration: this.registrationId,
-                contextActivities: {
-                    parent: [{
-                        id: this.activityId,
-                        objectType: 'Activity'
-                    }]
-                }
+                registration: this.registrationId
             }
         };
 
